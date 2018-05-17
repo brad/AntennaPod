@@ -2,13 +2,13 @@ language: android
 jdk: oraclejdk8
 android:
   components:
-    - build-tools-19.1.0
-    - android-19
-    - sys-img-armeabi-v7a-android-19
+    - build-tools-27.0.3
+    - android-26
+    - sys-img-armeabi-v7a-android-26
 
 env:
   matrix:
-    - ANDROID_SDKS=android-19,sysimg-19 ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
+    - ANDROID_SDKS=android-26,sysimg-26 ANDROID_TARGET=android-26 ANDROID_ABI=armeabi-v7a
 before_install:
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
