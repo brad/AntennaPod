@@ -3,6 +3,7 @@ jdk: oraclejdk8
 android:
   components:
     - build-tools-27.0.3
+    - android-24
     - android-26
     - sys-img-armeabi-v7a-android-24
 
