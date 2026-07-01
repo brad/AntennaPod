@@ -22,6 +22,11 @@ public final class WearSerializer {
     private static final String KEY_DURATION = "duration";
     private static final String KEY_POSITION = "position";
     private static final String KEY_IS_PLAYING = "is_playing";
+    private static final String KEY_SPEED = "speed";
+    private static final String KEY_FAST_FORWARD_SECS = "fast_forward_secs";
+    private static final String KEY_REWIND_SECS = "rewind_secs";
+    private static final String KEY_VOLUME = "volume";
+    private static final String KEY_MAX_VOLUME = "max_volume";
 
     private WearSerializer() {
     }
@@ -115,10 +120,16 @@ public final class WearSerializer {
     }
 
     @NonNull
-    public static byte[] nowPlayingToBytes(@NonNull FeedItem item, boolean isPlaying) {
+    public static byte[] nowPlayingToBytes(@NonNull FeedItem item, boolean isPlaying, float speed,
+                                           int fastForwardSecs, int rewindSecs, int volume, int maxVolume) {
         try {
             JSONObject obj = episodeToJson(item);
             obj.put(KEY_IS_PLAYING, isPlaying);
+            obj.put(KEY_SPEED, (double) speed);
+            obj.put(KEY_FAST_FORWARD_SECS, fastForwardSecs);
+            obj.put(KEY_REWIND_SECS, rewindSecs);
+            obj.put(KEY_VOLUME, volume);
+            obj.put(KEY_MAX_VOLUME, maxVolume);
             return obj.toString().getBytes(StandardCharsets.UTF_8);
         } catch (JSONException e) {
             return new byte[0];
@@ -134,7 +145,12 @@ public final class WearSerializer {
             JSONObject obj = new JSONObject(new String(data, StandardCharsets.UTF_8));
             FeedItem item = episodeFromJson(obj);
             boolean isPlaying = obj.optBoolean(KEY_IS_PLAYING, false);
-            return new WearNowPlaying(item, isPlaying);
+            float speed = (float) obj.optDouble(KEY_SPEED, 1.0);
+            int fastForwardSecs = obj.optInt(KEY_FAST_FORWARD_SECS, 30);
+            int rewindSecs = obj.optInt(KEY_REWIND_SECS, 10);
+            int volume = obj.optInt(KEY_VOLUME, 0);
+            int maxVolume = obj.optInt(KEY_MAX_VOLUME, 0);
+            return new WearNowPlaying(item, isPlaying, speed, fastForwardSecs, rewindSecs, volume, maxVolume);
         } catch (JSONException e) {
             return null;
         }

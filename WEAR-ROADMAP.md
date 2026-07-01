@@ -5,10 +5,10 @@ This document outlines the tasks required to build a high-quality Wear OS compan
 ## Phase 1: Player Experience & MVP (Current Focus)
 
 ### 1.1 Communication Layer Enhancements
-- [ ] **Add Skip/Seek Support to Data Layer**: Update `WearDataPaths.java` and `WearListenerService.java` on the phone to handle skip forward, skip backward, and seek-to-position messages.
-- [ ] **Implement Playback Speed Control**: Add paths and logic to get/set playback speed via the Wear OS DataLayer.
-- [ ] **Implement Volume Control**: Add paths and logic to sync and control phone volume from the watch.
-- [ ] **Enhance `WearNowPlaying` Model**: Update serialization to include current playback speed, skip intervals, and volume levels.
+- [x] **Add Skip/Seek Support to Data Layer**: Update `WearDataPaths.java` and `WearListenerService.java` on the phone to handle skip forward, skip backward, and seek-to-position messages.
+- [x] **Implement Playback Speed Control**: Add paths and logic to get/set playback speed via the Wear OS DataLayer.
+- [x] **Implement Volume Control**: Add paths and logic to sync and control phone volume from the watch.
+- [x] **Enhance `WearNowPlaying` Model**: Update serialization to include current playback speed, skip intervals, and volume levels.
 
 ### 1.2 Modern Player UI
 - [ ] **Create Dedicated Player Screen**: Implement a new `PlayerActivity` and `PlayerViewModel` to replace the basic `EpisodeDetailActivity`.

@@ -5,6 +5,7 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import de.danoeh.antennapod.playback.service.PlaybackService;
 import de.danoeh.antennapod.storage.preferences.PlaybackPreferences;
+import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import com.google.android.gms.wearable.WearableListenerService;
@@ -13,6 +14,8 @@ import de.danoeh.antennapod.model.feed.FeedItem;
 import de.danoeh.antennapod.model.feed.FeedItemFilter;
 import de.danoeh.antennapod.model.feed.SortOrder;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.content.Context;
 import de.danoeh.antennapod.playback.service.PlaybackController;
 import de.danoeh.antennapod.ui.appstartintent.MainActivityStarter;
 import de.danoeh.antennapod.model.feed.FeedMedia;
@@ -46,9 +49,15 @@ public class WearListenerService extends WearableListenerService {
                 if (media == null) {
                     return;
                 }
+                AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                int ff = UserPreferences.getFastForwardSecs();
+                int rw = UserPreferences.getRewindSecs();
+
                 if (!PlaybackService.isRunning) {
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(media.getItem(), false));
+                            WearSerializer.nowPlayingToBytes(media.getItem(), false, 1.0f, ff, rw, volume, maxVolume));
                     return;
                 }
                 PlaybackController.bindToMedia3Service(this, controller -> {
@@ -56,12 +65,22 @@ public class WearListenerService extends WearableListenerService {
                     if (controller.getDuration() > 0) {
                         media.setDuration((int) controller.getDuration());
                     }
+                    float speed = controller.getPlaybackParameters().speed;
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(media.getItem(), true));
+                            WearSerializer.nowPlayingToBytes(media.getItem(), true, speed, ff, rw, volume, maxVolume));
                 });
                 break;
             case WearDataPaths.PAUSE:
                 PlaybackController.bindToMedia3Service(this, controller -> controller.pause());
+                break;
+            case WearDataPaths.RESUME:
+                PlaybackController.bindToMedia3Service(this, controller -> controller.play());
+                break;
+            case WearDataPaths.SKIP_FORWARD:
+                PlaybackController.bindToMedia3Service(this, controller -> controller.seekForward());
+                break;
+            case WearDataPaths.SKIP_BACKWARD:
+                PlaybackController.bindToMedia3Service(this, controller -> controller.seekBack());
                 break;
             case WearDataPaths.QUEUE:
                 reply(sourceNodeId, path, WearSerializer.episodesToBytes(DBReader.getQueue()));
@@ -84,6 +103,28 @@ public class WearListenerService extends WearableListenerService {
                         playItem(itemId);
                     } catch (NumberFormatException e) {
                         Log.w(TAG, "Ignoring malformed play path: " + path, e);
+                    }
+                } else if (path.startsWith(WearDataPaths.SEEK_PREFIX)) {
+                    try {
+                        long position = Long.parseLong(path.substring(WearDataPaths.SEEK_PREFIX.length()));
+                        PlaybackController.bindToMedia3Service(this, controller -> controller.seekTo(position));
+                    } catch (NumberFormatException e) {
+                        Log.w(TAG, "Ignoring malformed seek path: " + path, e);
+                    }
+                } else if (path.startsWith(WearDataPaths.SET_SPEED_PREFIX)) {
+                    try {
+                        float speed = Float.parseFloat(path.substring(WearDataPaths.SET_SPEED_PREFIX.length()));
+                        PlaybackController.bindToMedia3Service(this, controller -> controller.setPlaybackSpeed(speed));
+                    } catch (NumberFormatException e) {
+                        Log.w(TAG, "Ignoring malformed speed path: " + path, e);
+                    }
+                } else if (path.startsWith(WearDataPaths.SET_VOLUME_PREFIX)) {
+                    try {
+                        int volumeLevel = Integer.parseInt(path.substring(WearDataPaths.SET_VOLUME_PREFIX.length()));
+                        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        am.setStreamVolume(AudioManager.STREAM_MUSIC, volumeLevel, 0);
+                    } catch (NumberFormatException e) {
+                        Log.w(TAG, "Ignoring malformed volume path: " + path, e);
                     }
                 } else if (path.startsWith(WearDataPaths.FEED_EPISODES_PREFIX)) {
                     try {

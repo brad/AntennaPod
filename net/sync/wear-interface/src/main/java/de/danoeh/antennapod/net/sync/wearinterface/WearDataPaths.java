@@ -9,10 +9,28 @@ public final class WearDataPaths {
     public static final String PLAY_PREFIX = "/play/";
     public static final String NOW_PLAYING = "/now_playing";
     public static final String PAUSE = "/pause";
+    public static final String RESUME = "/resume";
+    public static final String SKIP_FORWARD = "/skip_forward";
+    public static final String SKIP_BACKWARD = "/skip_backward";
+    public static final String SEEK_PREFIX = "/seek/";
+    public static final String SET_SPEED_PREFIX = "/set_speed/";
+    public static final String SET_VOLUME_PREFIX = "/set_volume/";
     public static final String OPEN_ON_PHONE_PREFIX = "/open_on_phone/";
 
     public static String playPath(long itemId) {
         return PLAY_PREFIX + itemId;
+    }
+
+    public static String seekPath(long position) {
+        return SEEK_PREFIX + position;
+    }
+
+    public static String setSpeedPath(float speed) {
+        return SET_SPEED_PREFIX + speed;
+    }
+
+    public static String setVolumePath(int volume) {
+        return SET_VOLUME_PREFIX + volume;
     }
 
     public static String openOnPhonePath(long itemId) {
