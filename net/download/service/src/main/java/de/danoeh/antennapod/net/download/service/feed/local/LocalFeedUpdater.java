@@ -3,6 +3,7 @@ package de.danoeh.antennapod.net.download.service.feed.local;
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.provider.DocumentsContract;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -126,7 +127,7 @@ public class LocalFeedUpdater {
             }
         }
 
-        feed.setImageUrl(getImageUrl(allFiles, folderUri));
+        feed.setImageUrl(getImageUrl(context, allFiles, folderUri));
 
         feed.getPreferences().setAutoDownload(FeedPreferences.AutoDownloadSetting.DISABLED);
         feed.setDescription(context.getString(R.string.local_feed_description));
@@ -141,7 +142,12 @@ public class LocalFeedUpdater {
      * Returns the image URL for the local feed.
      */
     @NonNull
-    static String getImageUrl(List<FastDocumentFile> files, Uri folderUri) {
+    static String getImageUrl(Context context, List<FastDocumentFile> files, Uri folderUri) {
+        String coverImage = findCoverImageRecursive(context, folderUri, folderUri, 0);
+        if (coverImage != null) {
+            return coverImage;
+        }
+
         // look for special file names
         for (String iconLocation : PREFERRED_FEED_IMAGE_FILENAMES) {
             for (FastDocumentFile file : files) {
@@ -161,6 +167,40 @@ public class LocalFeedUpdater {
 
         // use default icon as fallback
         return Feed.PREFIX_GENERATIVE_COVER + folderUri;
+    }
+
+    @Nullable
+    private static String findCoverImageRecursive(Context context, Uri treeUri, Uri currentFolderUri, int depth) {
+        if (depth >= 5) {
+            return null;
+        }
+
+        String currentId;
+        try {
+            currentId = DocumentsContract.getDocumentId(currentFolderUri);
+        } catch (Exception e) {
+            try {
+                currentId = DocumentsContract.getTreeDocumentId(currentFolderUri);
+            } catch (Exception e2) {
+                return null;
+            }
+        }
+
+        List<FastDocumentFile> files = FastDocumentFile.list(context, treeUri, currentId);
+        for (FastDocumentFile file : files) {
+            if (file.getName().equalsIgnoreCase("cover.jpg") || file.getName().equalsIgnoreCase("cover.jpeg")) {
+                return file.getUri().toString();
+            }
+        }
+        for (FastDocumentFile file : files) {
+            if (DocumentsContract.Document.MIME_TYPE_DIR.equals(file.getType())) {
+                String result = findCoverImageRecursive(context, treeUri, file.getUri(), depth + 1);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     private static FeedItem feedContainsFile(Feed feed, String filename) {
