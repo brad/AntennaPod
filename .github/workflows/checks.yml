@@ -88,11 +88,21 @@ jobs:
       - name: Configure parallel build
         run: echo "org.gradle.parallel=true" >> local.properties
       - name: Create temporary release keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          keytool -noprompt -genkey -v -keystore "app/keystore" -alias alias -storepass password -keypass password -keyalg RSA -validity 10 -dname "CN=antennapod.org, OU=dummy, O=dummy, L=dummy, S=dummy, C=US"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > app/keystore
+          else
+            keytool -noprompt -genkey -v -keystore "app/keystore" -alias alias -storepass password -keypass password -keyalg RSA -validity 10 -dname "CN=antennapod.org, OU=dummy, O=dummy, L=dummy, S=dummy, C=US"
+          fi
           cp app/keystore app-wearos/keystore
       - name: Build
-        run: ./gradlew assemble${{ matrix.variant }}
+        run: |
+          ./gradlew assemble${{ matrix.variant }} \
+            -PreleaseStorePassword="${{ secrets.RELEASE_STORE_PASSWORD || 'password' }}" \
+            -PreleaseKeyAlias="${{ secrets.RELEASE_KEY_ALIAS || 'alias' }}" \
+            -PreleaseKeyPassword="${{ secrets.RELEASE_KEY_PASSWORD || 'password' }}"
       - name: Test
         if: matrix.execute-tests == true
         run: ./gradlew test${{ matrix.variant }}UnitTest test${{ matrix.base-variant }}UnitTest
