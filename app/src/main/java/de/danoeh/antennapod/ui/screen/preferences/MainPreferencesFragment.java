@@ -16,6 +16,12 @@ import de.danoeh.antennapod.storage.preferences.UserPreferences;
 import de.danoeh.antennapod.ui.common.IntentUtils;
 import de.danoeh.antennapod.ui.preferences.screen.AnimatedPreferenceFragment;
 import de.danoeh.antennapod.ui.preferences.screen.about.AboutFragment;
+import androidx.wear.remote.interactions.RemoteActivityHelper;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
+import android.content.Intent;
+import android.net.Uri;
+import android.widget.Toast;
 import de.danoeh.antennapod.ui.preferences.screen.bugreport.BugReportFragment;
 
 
@@ -25,6 +31,7 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
     private static final String PREF_SCREEN_PLAYBACK = "prefScreenPlayback";
     private static final String PREF_SCREEN_DOWNLOADS = "prefScreenDownloads";
     private static final String PREF_SCREEN_IMPORT_EXPORT = "prefScreenImportExport";
+    private static final String PREF_SCREEN_WEAR_OS = "prefScreenWearOS";
     private static final String PREF_SCREEN_SYNCHRONIZATION = "prefScreenSynchronization";
     private static final String PREF_DOCUMENTATION = "prefDocumentation";
     private static final String PREF_VIEW_FORUM = "prefViewForum";
@@ -100,6 +107,10 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
             ((PreferenceActivity) getActivity()).openScreen(R.xml.preferences_notifications);
             return true;
         });
+        findPreference(PREF_SCREEN_WEAR_OS).setOnPreferenceClickListener(preference -> {
+            openPlayStoreOnWatch();
+            return true;
+        });
         findPreference(PREF_ABOUT).setOnPreferenceClickListener(
                 preference -> {
                     getParentFragmentManager().beginTransaction()
@@ -147,6 +158,22 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
                 isChildDevice || BuildConfig.DEBUG || UserPreferences.isParentalControlPasswordSet());
     }
 
+    private void openPlayStoreOnWatch() {
+        RemoteActivityHelper remoteActivityHelper = new RemoteActivityHelper(requireContext(), Runnable::run);
+        Wearable.getNodeClient(requireContext()).getConnectedNodes().addOnSuccessListener(nodes -> {
+            if (nodes.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.wearos_phone_not_reachable, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            for (Node node : nodes) {
+                Intent intent = new Intent(Intent.ACTION_VIEW)
+                        .addCategory(Intent.CATEGORY_BROWSABLE)
+                        .setData(Uri.parse("market://details?id=" + requireContext().getPackageName()));
+                remoteActivityHelper.startRemoteActivity(intent, node.getId());
+            }
+        });
+    }
+
     private void setupSearch() {
         SearchPreference searchPreference = findPreference("searchPreference");
         SearchConfiguration config = searchPreference.getSearchConfiguration();
@@ -170,6 +197,8 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
                 .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.preferences_synchronization));
         config.index(R.xml.preferences_notifications)
                 .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.preferences_notifications));
+        config.index(R.xml.preferences)
+                .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.preferences));
         config.index(R.xml.feed_settings)
                 .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.feed_settings));
         config.index(R.xml.preferences_swipe)

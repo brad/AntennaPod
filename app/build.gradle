@@ -109,6 +109,7 @@ dependencies {
     implementation libs.androidx.media3.session
     implementation libs.androidx.media3.ui
     playImplementation libs.google.play.services.wearable
+    playImplementation libs.androidx.wear.remote.interactions
 
     implementation libs.commons.lang3
     implementation libs.commons.io

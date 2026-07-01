@@ -1051,4 +1051,6 @@
     <string name="wearos_play_on_phone" tools:ignore="UnusedResources">Play on phone</string>
     <string name="wearos_browse_phone" tools:ignore="UnusedResources">Browse phone</string>
     <string name="wearos_open_on_phone" tools:ignore="UnusedResources">Open on phone</string>
+    <string name="pref_wearos_label">Wear OS</string>
+    <string name="pref_wearos_sum">Install or manage the Wear OS companion app</string>
 </resources>
