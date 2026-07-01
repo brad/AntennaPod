@@ -167,3 +167,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed"
+
+  nightly-release:
+    name: "Nightly Release"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs: ci-summary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-play-debug.apk
+          path: release-artifacts
+      - name: Prepare Release
+        id: prep
+        run: |
+          TAG_NAME="nightly-$(date +'%Y-%m-%d-%H%M')"
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          mv release-artifacts/app-play-debug.apk "AntennaPod-$TAG_NAME.apk"
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.prep.outputs.tag_name }}
+          files: AntennaPod-${{ steps.prep.outputs.tag_name }}.apk
+          prerelease: true
+          name: "Nightly Build ${{ steps.prep.outputs.tag_name }}"
+          body: "This is a nightly build of the develop branch."
