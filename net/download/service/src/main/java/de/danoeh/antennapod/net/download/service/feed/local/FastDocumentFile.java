@@ -20,8 +20,13 @@ public class FastDocumentFile {
     private final long lastModified;
 
     public static List<FastDocumentFile> list(Context context, Uri folderUri) {
-        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(folderUri,
-                DocumentsContract.getDocumentId(folderUri));
+        String documentId = DocumentsContract.getDocumentId(folderUri);
+        return list(context, folderUri, documentId);
+    }
+
+    public static List<FastDocumentFile> list(Context context, Uri treeUri, String documentId) {
+        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri,
+                documentId);
         Cursor cursor = context.getContentResolver().query(childrenUri, new String[] {
                 DocumentsContract.Document.COLUMN_DOCUMENT_ID,
                 DocumentsContract.Document.COLUMN_DISPLAY_NAME,
@@ -35,7 +40,7 @@ public class FastDocumentFile {
         try {
             while (cursor.moveToNext()) {
                 String id = cursor.getString(0);
-                Uri uri = DocumentsContract.buildDocumentUriUsingTree(folderUri, id);
+                Uri uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, id);
                 String name = cursor.getString(1);
                 long size = cursor.getLong(2);
                 long lastModified = cursor.getLong(3);
