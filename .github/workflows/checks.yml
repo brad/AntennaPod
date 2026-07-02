@@ -109,8 +109,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: matrix.upload-artifact == true
         with:
-          name: app-play-debug.apk
-          path: app/build/outputs/apk/play/debug/app-play-debug.apk
+          name: apks
+          path: |
+            app/build/outputs/apk/play/debug/app-play-debug.apk
+            app-wearos/build/outputs/apk/play/debug/app-wearos-play-debug.apk
 
   emulator-test:
     name: "Emulator Test API ${{ matrix.version.api-level }}"
@@ -189,19 +191,22 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v4
         with:
-          name: app-play-debug.apk
+          name: apks
           path: release-artifacts
       - name: Prepare Release
         id: prep
         run: |
           TAG_NAME="nightly-$(date +'%Y-%m-%d-%H%M')"
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-          mv release-artifacts/app-play-debug.apk "AntennaPod-$TAG_NAME.apk"
+          find release-artifacts -name "app-play-debug.apk" -exec mv {} "AntennaPod-$TAG_NAME.apk" \;
+          find release-artifacts -name "app-wearos-play-debug.apk" -exec mv {} "AntennaPod-Wear-$TAG_NAME.apk" \;
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.prep.outputs.tag_name }}
-          files: AntennaPod-${{ steps.prep.outputs.tag_name }}.apk
+          files: |
+            AntennaPod-${{ steps.prep.outputs.tag_name }}.apk
+            AntennaPod-Wear-${{ steps.prep.outputs.tag_name }}.apk
           prerelease: true
           name: "Nightly Build ${{ steps.prep.outputs.tag_name }}"
           body: "This is a nightly build of the develop branch."
