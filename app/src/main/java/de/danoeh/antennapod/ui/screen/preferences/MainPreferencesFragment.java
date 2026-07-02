@@ -25,6 +25,7 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
     private static final String PREF_SCREEN_PLAYBACK = "prefScreenPlayback";
     private static final String PREF_SCREEN_DOWNLOADS = "prefScreenDownloads";
     private static final String PREF_SCREEN_IMPORT_EXPORT = "prefScreenImportExport";
+    static final String PREF_SCREEN_WEAR_OS = "prefScreenWearOS";
     private static final String PREF_SCREEN_SYNCHRONIZATION = "prefScreenSynchronization";
     private static final String PREF_DOCUMENTATION = "prefDocumentation";
     private static final String PREF_VIEW_FORUM = "prefViewForum";
@@ -100,6 +101,7 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
             ((PreferenceActivity) getActivity()).openScreen(R.xml.preferences_notifications);
             return true;
         });
+        WearStoreHelper.setup(this);
         findPreference(PREF_ABOUT).setOnPreferenceClickListener(
                 preference -> {
                     getParentFragmentManager().beginTransaction()
@@ -170,6 +172,8 @@ public class MainPreferencesFragment extends AnimatedPreferenceFragment {
                 .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.preferences_synchronization));
         config.index(R.xml.preferences_notifications)
                 .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.preferences_notifications));
+        config.index(R.xml.preferences)
+                .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.preferences));
         config.index(R.xml.feed_settings)
                 .addBreadcrumb(PreferenceActivity.getTitleOfPage(R.xml.feed_settings));
         config.index(R.xml.preferences_swipe)
