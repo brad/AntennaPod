@@ -53,7 +53,8 @@ fun EpisodeListScreen(uiState: EpisodeListUiState, onOpenEpisodeDetail: (FeedIte
         isPhoneSupported = uiState.isPhoneSupported,
         isTimedOut = uiState.isTimedOut,
         isLoading = episodes == null,
-        isEmpty = episodes?.isEmpty() == true
+        isEmpty = episodes?.isEmpty() == true,
+        backgroundImageUrl = episodes?.firstOrNull()?.imageUrl
     ) {
         items(episodes!!) { episode ->
             ListItem(

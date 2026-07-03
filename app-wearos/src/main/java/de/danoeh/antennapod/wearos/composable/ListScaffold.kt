@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -18,6 +20,7 @@ import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScrollIndicator
 import androidx.wear.compose.material3.Text
+import coil.compose.AsyncImage
 import de.danoeh.antennapod.ui.common.R as CommonR
 
 @Composable
@@ -28,9 +31,20 @@ fun ListScaffold(
     isTimedOut: Boolean,
     isLoading: Boolean,
     isEmpty: Boolean,
+    backgroundImageUrl: String? = null,
     content: ScalingLazyListScope.() -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
+        if (backgroundImageUrl != null) {
+            AsyncImage(
+                model = backgroundImageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.2f),
+                contentScale = ContentScale.Crop
+            )
+        }
         ScalingLazyColumn(
             modifier = Modifier.fillMaxWidth(),
             state = scrollState
