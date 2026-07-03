@@ -21,13 +21,15 @@ class FeedListActivity : ComponentActivity() {
         val viewModel = ViewModelProvider(this)[FeedListViewModel::class.java]
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
-            FeedListScreen(uiState = uiState, onOpenFeedEpisodes = { feedId ->
-                val intent = Intent(this, EpisodeListActivity::class.java).apply {
-                    putExtra(EpisodeListActivity.EXTRA_PATH, WearDataPaths.feedEpisodesPath(feedId))
-                }
-                startActivity(intent)
-            })
+            AntennaPodTheme {
+                val uiState by viewModel.uiState.collectAsState()
+                FeedListScreen(uiState = uiState, onOpenFeedEpisodes = { feedId ->
+                    val intent = Intent(this, EpisodeListActivity::class.java).apply {
+                        putExtra(EpisodeListActivity.EXTRA_PATH, WearDataPaths.feedEpisodesPath(feedId))
+                    }
+                    startActivity(intent)
+                })
+            }
         }
     }
 }
