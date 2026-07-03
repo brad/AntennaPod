@@ -21,7 +21,9 @@ import de.danoeh.antennapod.net.sync.wearinterface.WearSerializer;
 import de.danoeh.antennapod.playback.service.PlaybackServiceStarter;
 import de.danoeh.antennapod.storage.database.DBReader;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WearListenerService extends WearableListenerService {
     private static final String TAG = "WearListenerService";
@@ -46,9 +48,14 @@ public class WearListenerService extends WearableListenerService {
                 if (media == null) {
                     return;
                 }
+                FeedItem nowPlayingItem = media.getItem();
+                if (nowPlayingItem != null && nowPlayingItem.getFeed() == null) {
+                    nowPlayingItem.setFeed(DBReader.getFeed(nowPlayingItem.getFeedId(), false, 0, 0));
+                    nowPlayingItem.setImageUrl(nowPlayingItem.getImageLocation());
+                }
                 if (!PlaybackService.isRunning) {
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(media.getItem(), false));
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, false));
                     return;
                 }
                 PlaybackController.bindToMedia3Service(this, controller -> {
@@ -57,22 +64,28 @@ public class WearListenerService extends WearableListenerService {
                         media.setDuration((int) controller.getDuration());
                     }
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(media.getItem(), true));
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, true));
                 });
                 break;
             case WearDataPaths.PAUSE:
                 PlaybackController.bindToMedia3Service(this, controller -> controller.pause());
                 break;
             case WearDataPaths.QUEUE:
-                reply(sourceNodeId, path, WearSerializer.episodesToBytes(DBReader.getQueue()));
+                List<FeedItem> queue = DBReader.getQueue();
+                populateImages(queue);
+                reply(sourceNodeId, path, WearSerializer.episodesToBytes(queue));
                 break;
             case WearDataPaths.DOWNLOADS:
-                reply(sourceNodeId, path, WearSerializer.episodesToBytes(DBReader.getEpisodes(0, MAX_ITEMS,
-                        new FeedItemFilter(FeedItemFilter.DOWNLOADED), SortOrder.DATE_NEW_OLD)));
+                List<FeedItem> downloads = DBReader.getEpisodes(0, MAX_ITEMS,
+                        new FeedItemFilter(FeedItemFilter.DOWNLOADED), SortOrder.DATE_NEW_OLD);
+                populateImages(downloads);
+                reply(sourceNodeId, path, WearSerializer.episodesToBytes(downloads));
                 break;
             case WearDataPaths.EPISODES:
-                reply(sourceNodeId, path, WearSerializer.episodesToBytes(DBReader.getEpisodes(0, MAX_ITEMS,
-                        FeedItemFilter.unfiltered(), SortOrder.DATE_NEW_OLD)));
+                List<FeedItem> episodes = DBReader.getEpisodes(0, MAX_ITEMS,
+                        FeedItemFilter.unfiltered(), SortOrder.DATE_NEW_OLD);
+                populateImages(episodes);
+                reply(sourceNodeId, path, WearSerializer.episodesToBytes(episodes));
                 break;
             case WearDataPaths.SUBSCRIPTIONS:
                 reply(sourceNodeId, path, WearSerializer.feedsToBytes(DBReader.getFeedList()));
@@ -90,6 +103,12 @@ public class WearListenerService extends WearableListenerService {
                         long feedId = Long.parseLong(path.substring(WearDataPaths.FEED_EPISODES_PREFIX.length()));
                         Feed feed = DBReader.getFeed(feedId, false, 0, MAX_ITEMS);
                         List<FeedItem> feedItems = feed != null ? feed.getItems() : java.util.Collections.emptyList();
+                        if (feed != null) {
+                            for (FeedItem item : feedItems) {
+                                item.setFeed(feed);
+                                item.setImageUrl(item.getImageLocation());
+                            }
+                        }
                         reply(sourceNodeId, path, WearSerializer.episodesToBytes(feedItems));
                     } catch (NumberFormatException e) {
                         Log.w(TAG, "Ignoring malformed feed episodes path: " + path, e);
@@ -127,5 +146,19 @@ public class WearListenerService extends WearableListenerService {
         Wearable.getMessageClient(this).sendMessage(nodeId, path, payload)
                 .addOnSuccessListener(id -> Log.d(TAG, "Reply sent: " + path))
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to send reply to " + path, e));
+    }
+
+    private void populateImages(List<FeedItem> items) {
+        List<Feed> feeds = DBReader.getFeedList();
+        Map<Long, Feed> feedMap = new HashMap<>();
+        for (Feed feed : feeds) {
+            feedMap.put(feed.getId(), feed);
+        }
+        for (FeedItem item : items) {
+            if (item.getFeed() == null) {
+                item.setFeed(feedMap.get(item.getFeedId()));
+            }
+            item.setImageUrl(item.getImageLocation());
+        }
     }
 }

@@ -22,6 +22,7 @@ public final class WearSerializer {
     private static final String KEY_DURATION = "duration";
     private static final String KEY_POSITION = "position";
     private static final String KEY_IS_PLAYING = "is_playing";
+    private static final String KEY_IMAGE_URL = "image_url";
 
     private WearSerializer() {
     }
@@ -34,6 +35,7 @@ public final class WearSerializer {
         obj.put(KEY_PUB_DATE, item.getPubDate() != null ? item.getPubDate().getTime() : 0);
         obj.put(KEY_DURATION, item.getMedia() != null ? item.getMedia().getDuration() : 0);
         obj.put(KEY_POSITION, item.getMedia() != null ? item.getMedia().getPosition() : 0);
+        obj.put(KEY_IMAGE_URL, item.getImageLocation());
         return obj;
     }
 
@@ -50,6 +52,7 @@ public final class WearSerializer {
         int position = obj.optInt(KEY_POSITION, 0);
         FeedMedia media = new FeedMedia(0, item, duration, position, 0, null, null, null, 0, null, 0, 0L);
         item.setMedia(media);
+        item.setImageUrl(obj.optString(KEY_IMAGE_URL, null));
         return item;
     }
 
@@ -88,6 +91,7 @@ public final class WearSerializer {
                 JSONObject obj = new JSONObject();
                 obj.put(KEY_FEED_ID, feed.getId());
                 obj.put(KEY_TITLE, feed.getTitle() != null ? feed.getTitle() : "");
+                obj.put(KEY_IMAGE_URL, feed.getImageUrl());
                 array.put(obj);
             } catch (JSONException e) {
                 // skip malformed feed
@@ -106,6 +110,7 @@ public final class WearSerializer {
                 Feed feed = new Feed(null, null);
                 feed.setId(obj.optLong(KEY_FEED_ID, -1));
                 feed.setTitle(obj.optString(KEY_TITLE, ""));
+                feed.setImageUrl(obj.optString(KEY_IMAGE_URL, null));
                 feeds.add(feed);
             }
         } catch (JSONException e) {
