@@ -24,16 +24,18 @@ class EpisodeListActivity : ComponentActivity() {
         val viewModel = ViewModelProvider(this, EpisodeListViewModel.factory(path))[EpisodeListViewModel::class.java]
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
-            EpisodeListScreen(
-                uiState = uiState,
-                onOpenEpisodeDetail = { episode ->
-                    val intent = Intent(this, EpisodeDetailActivity::class.java).apply {
-                        putExtra(EpisodeDetailActivity.EXTRA_EPISODE, episode)
+            AntennaPodTheme {
+                val uiState by viewModel.uiState.collectAsState()
+                EpisodeListScreen(
+                    uiState = uiState,
+                    onOpenEpisodeDetail = { episode ->
+                        val intent = Intent(this, EpisodeDetailActivity::class.java).apply {
+                            putExtra(EpisodeDetailActivity.EXTRA_EPISODE, episode)
+                        }
+                        startActivity(intent)
                     }
-                    startActivity(intent)
-                }
-            )
+                )
+            }
         }
     }
 

@@ -56,13 +56,15 @@ class EpisodeDetailActivity : ComponentActivity() {
             .get(EpisodeDetailViewModel::class.java)
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
-            EpisodeDetailScreen(
-                uiState = uiState,
-                onPlay = { viewModel.play() },
-                onPause = { viewModel.pause() },
-                onOpenOnPhone = { viewModel.openOnPhone() }
-            )
+            AntennaPodTheme {
+                val uiState by viewModel.uiState.collectAsState()
+                EpisodeDetailScreen(
+                    uiState = uiState,
+                    onPlay = { viewModel.play() },
+                    onPause = { viewModel.pause() },
+                    onOpenOnPhone = { viewModel.openOnPhone() }
+                )
+            }
         }
     }
 

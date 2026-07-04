@@ -36,25 +36,27 @@ class MainListActivity : ComponentActivity() {
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
-            MainListScreen(
-                uiState = uiState,
-                onOpenEpisodeDetail = { episode ->
-                    val intent = Intent(this, EpisodeDetailActivity::class.java).apply {
-                        putExtra(EpisodeDetailActivity.EXTRA_EPISODE, episode)
+            AntennaPodTheme {
+                val uiState by viewModel.uiState.collectAsState()
+                MainListScreen(
+                    uiState = uiState,
+                    onOpenEpisodeDetail = { episode ->
+                        val intent = Intent(this, EpisodeDetailActivity::class.java).apply {
+                            putExtra(EpisodeDetailActivity.EXTRA_EPISODE, episode)
+                        }
+                        startActivity(intent)
+                    },
+                    onOpenFeedList = {
+                        startActivity(Intent(this, FeedListActivity::class.java))
+                    },
+                    onOpenEpisodeList = { path ->
+                        val intent = Intent(this, EpisodeListActivity::class.java).apply {
+                            putExtra(EpisodeListActivity.EXTRA_PATH, path)
+                        }
+                        startActivity(intent)
                     }
-                    startActivity(intent)
-                },
-                onOpenFeedList = {
-                    startActivity(Intent(this, FeedListActivity::class.java))
-                },
-                onOpenEpisodeList = { path ->
-                    val intent = Intent(this, EpisodeListActivity::class.java).apply {
-                        putExtra(EpisodeListActivity.EXTRA_PATH, path)
-                    }
-                    startActivity(intent)
-                }
-            )
+                )
+            }
         }
     }
 }
