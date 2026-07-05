@@ -23,6 +23,7 @@ public final class WearSerializer {
     private static final String KEY_POSITION = "position";
     private static final String KEY_IS_PLAYING = "is_playing";
     private static final String KEY_IMAGE_URL = "image_url";
+    private static final String KEY_FEED_TITLE = "feed_title";
 
     private WearSerializer() {
     }
@@ -36,6 +37,7 @@ public final class WearSerializer {
         obj.put(KEY_DURATION, item.getMedia() != null ? item.getMedia().getDuration() : 0);
         obj.put(KEY_POSITION, item.getMedia() != null ? item.getMedia().getPosition() : 0);
         obj.put(KEY_IMAGE_URL, item.getImageLocation());
+        obj.put(KEY_FEED_TITLE, item.getFeed() != null ? item.getFeed().getTitle() : "");
         return obj;
     }
 
@@ -53,6 +55,12 @@ public final class WearSerializer {
         FeedMedia media = new FeedMedia(0, item, duration, position, 0, null, null, null, 0, null, 0, 0L);
         item.setMedia(media);
         item.setImageUrl(obj.optString(KEY_IMAGE_URL, null));
+        String feedTitle = obj.optString(KEY_FEED_TITLE, null);
+        if (feedTitle != null) {
+            Feed feed = new Feed(null, null);
+            feed.setTitle(feedTitle);
+            item.setFeed(feed);
+        }
         return item;
     }
 

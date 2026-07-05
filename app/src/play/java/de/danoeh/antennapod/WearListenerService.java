@@ -70,6 +70,12 @@ public class WearListenerService extends WearableListenerService {
             case WearDataPaths.PAUSE:
                 PlaybackController.bindToMedia3Service(this, controller -> controller.pause());
                 break;
+            case WearDataPaths.SKIP_FORWARD:
+                PlaybackController.bindToMedia3Service(this, controller -> controller.seekTo(controller.getCurrentPosition() + 10000));
+                break;
+            case WearDataPaths.SKIP_BACKWARD:
+                PlaybackController.bindToMedia3Service(this, controller -> controller.seekTo(Math.max(0, controller.getCurrentPosition() - 10000)));
+                break;
             case WearDataPaths.QUEUE:
                 List<FeedItem> queue = DBReader.getQueue();
                 populateImages(queue);
