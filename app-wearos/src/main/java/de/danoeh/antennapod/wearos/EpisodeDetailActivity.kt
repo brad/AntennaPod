@@ -138,7 +138,8 @@ fun EpisodeDetailScreen(
                 ) {
                     Icon(
                         painter = painterResource(CommonR.drawable.ic_replay),
-                        contentDescription = stringResource(CommonR.string.rewind_label)
+                        contentDescription = stringResource(CommonR.string.rewind_label),
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -162,7 +163,8 @@ fun EpisodeDetailScreen(
                                 CommonR.string.play_label
                             }
                         ),
-                        modifier = Modifier.fillMaxSize(0.6f)
+                        modifier = Modifier.fillMaxSize(0.6f),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -172,7 +174,8 @@ fun EpisodeDetailScreen(
                 ) {
                     Icon(
                         painter = painterResource(CommonR.drawable.ic_fast_forward),
-                        contentDescription = stringResource(CommonR.string.fast_forward_label)
+                        contentDescription = stringResource(CommonR.string.fast_forward_label),
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -196,7 +199,8 @@ fun EpisodeDetailScreen(
                 ) {
                     Icon(
                         painter = painterResource(NotificationsR.drawable.ic_notification_stream),
-                        contentDescription = "Audio Output"
+                        contentDescription = "Audio Output",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -214,7 +218,8 @@ fun EpisodeDetailScreen(
                 ) {
                     Icon(
                         painter = painterResource(CommonR.drawable.ic_volume_adaption),
-                        contentDescription = "Volume"
+                        contentDescription = "Volume",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -226,7 +231,8 @@ fun EpisodeDetailScreen(
         ) {
             Icon(
                 painter = painterResource(CommonR.drawable.ic_arrow_full_up),
-                contentDescription = "Open drawer"
+                contentDescription = "Open drawer",
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
