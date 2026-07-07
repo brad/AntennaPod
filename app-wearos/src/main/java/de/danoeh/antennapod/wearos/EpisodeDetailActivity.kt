@@ -39,9 +39,9 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
 import coil.compose.AsyncImage
 import de.danoeh.antennapod.model.feed.FeedItem
-import de.danoeh.antennapod.wearos.composable.ListItem
 import de.danoeh.antennapod.ui.common.R as CommonR
 import de.danoeh.antennapod.ui.notifications.R as NotificationsR
+import de.danoeh.antennapod.wearos.composable.ListItem
 
 class EpisodeDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -148,12 +148,20 @@ fun EpisodeDetailScreen(
                 ) {
                     Icon(
                         painter = painterResource(
-                            if (uiState.isCurrentlyPlaying) CommonR.drawable.ic_pause_black
-                            else CommonR.drawable.ic_play_48dp_black
+                            if (uiState.isCurrentlyPlaying) {
+                                CommonR.drawable.ic_pause_black
+                            }
+                            else {
+                                CommonR.drawable.ic_play_48dp_black
+                            }
                         ),
                         contentDescription = stringResource(
-                            if (uiState.isCurrentlyPlaying) CommonR.string.pause_label
-                            else CommonR.string.play_label
+                            if (uiState.isCurrentlyPlaying) {
+                                CommonR.string.pause_label
+                            }
+                            else {
+                                CommonR.string.play_label
+                            }
                         ),
                         modifier = Modifier.fillMaxSize(0.6f)
                     )
@@ -176,8 +184,12 @@ fun EpisodeDetailScreen(
             ) {
                 IconButton(
                     onClick = {
-                        context.startActivity(Intent("com.google.android.wearable.action.LAUNCH_OUTPUT_SWITCHER")
-                            .putExtra("com.google.android.wearable.extra.PACKAGE_NAME", context.packageName))
+                        context.startActivity(
+                            Intent("com.google.android.wearable.action.LAUNCH_OUTPUT_SWITCHER")
+                                .putExtra(
+                                    "com.google.android.wearable.extra.PACKAGE_NAME",
+                                    context.packageName
+                                ))
                     },
                     modifier = Modifier.size(32.dp),
                     colors = IconButtonDefaults.filledTonalIconButtonColors()
