@@ -150,16 +150,14 @@ fun EpisodeDetailScreen(
                         painter = painterResource(
                             if (uiState.isCurrentlyPlaying) {
                                 CommonR.drawable.ic_pause_black
-                            }
-                            else {
+                            } else {
                                 CommonR.drawable.ic_play_48dp_black
                             }
                         ),
                         contentDescription = stringResource(
                             if (uiState.isCurrentlyPlaying) {
                                 CommonR.string.pause_label
-                            }
-                            else {
+                            } else {
                                 CommonR.string.play_label
                             }
                         ),
@@ -189,7 +187,8 @@ fun EpisodeDetailScreen(
                                 .putExtra(
                                     "com.google.android.wearable.extra.PACKAGE_NAME",
                                     context.packageName
-                                ))
+                                )
+                        )
                     },
                     modifier = Modifier.size(32.dp),
                     colors = IconButtonDefaults.filledTonalIconButtonColors()
