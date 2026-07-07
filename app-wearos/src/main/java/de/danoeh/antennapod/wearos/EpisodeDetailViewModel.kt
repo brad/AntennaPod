@@ -66,6 +66,14 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
         viewModelScope.launch(Dispatchers.IO) { WearMessageSender.send(getApplication(), WearDataPaths.PAUSE) }
     }
 
+    fun skipForward() {
+        viewModelScope.launch(Dispatchers.IO) { WearMessageSender.send(getApplication(), WearDataPaths.SKIP_FORWARD) }
+    }
+
+    fun skipBackward() {
+        viewModelScope.launch(Dispatchers.IO) { WearMessageSender.send(getApplication(), WearDataPaths.SKIP_BACKWARD) }
+    }
+
     fun openOnPhone() {
         viewModelScope.launch(Dispatchers.IO) {
             WearMessageSender.send(getApplication(), WearDataPaths.openOnPhonePath(episode.id))

@@ -10,6 +10,8 @@ public final class WearDataPaths {
     public static final String NOW_PLAYING = "/now_playing";
     public static final String PAUSE = "/pause";
     public static final String OPEN_ON_PHONE_PREFIX = "/open_on_phone/";
+    public static final String SKIP_FORWARD = "/skip_forward";
+    public static final String SKIP_BACKWARD = "/skip_backward";
 
     public static String playPath(long itemId) {
         return PLAY_PREFIX + itemId;

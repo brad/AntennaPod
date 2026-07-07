@@ -37,6 +37,24 @@ public class WearSerializerTest {
         assertEquals(90000, result.get(0).getMedia().getPosition());
     }
 
+
+    @Test
+    public void testEpisodesRoundTripWithFeedTitle() {
+        FeedItem item = new FeedItem();
+        item.setId(42L);
+        item.setTitle("Test Episode");
+        Feed feed = new Feed(null, null);
+        feed.setTitle("Test Feed Title");
+        item.setFeed(feed);
+
+        byte[] bytes = WearSerializer.episodesToBytes(Collections.singletonList(item));
+        List<FeedItem> result = WearSerializer.episodesFromBytes(bytes);
+
+        assertEquals(1, result.size());
+        assertEquals("Test Episode", result.get(0).getTitle());
+        assertEquals("Test Feed Title", result.get(0).getFeed().getTitle());
+    }
+
     @Test
     public void testEpisodesRoundTripEmpty() {
         byte[] bytes = WearSerializer.episodesToBytes(Collections.emptyList());
