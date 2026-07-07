@@ -1,8 +1,9 @@
 package de.danoeh.antennapod.wearos
 
+import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.basicMarquee
@@ -201,7 +202,12 @@ fun EpisodeDetailScreen(
 
                 IconButton(
                     onClick = {
-                        context.startActivity(Intent(Settings.ACTION_SOUND_SETTINGS))
+                        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                        audioManager.adjustStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_SAME,
+                            AudioManager.FLAG_SHOW_UI
+                        )
                     },
                     modifier = Modifier.size(32.dp),
                     colors = IconButtonDefaults.filledTonalIconButtonColors()
