@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -110,7 +111,7 @@ fun EpisodeDetailScreen(
                 text = item.title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .basicMarquee(),
+                    .basicMarquee(animationMode = MarqueeAnimationMode.Immediately),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 maxLines = 1
