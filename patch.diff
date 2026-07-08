@@ -1,0 +1,20 @@
+<<<<<<< SEARCH
+                IconButton(
+                    onClick = {
+                        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                        audioManager.adjustStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.ADJUST_SAME,
+                            AudioManager.FLAG_SHOW_UI
+                        )
+                    },
+                    modifier = Modifier.size(48.dp)
+                ) {
+=======
+                IconButton(
+                    onClick = {
+                        context.startActivity(Intent(context, VolumeControlActivity::class.java))
+                    },
+                    modifier = Modifier.size(48.dp)
+                ) {
+>>>>>>> REPLACE

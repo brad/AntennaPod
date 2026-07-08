@@ -1,0 +1,11 @@
+I have implemented a new volume control screen for the Wear OS app, as per the Material Design guidelines.
+
+Key changes:
+1. Created `VolumeControlActivity` and `VolumeControlScreen` in the `:app-wearos` module.
+2. The screen uses a `Stepper` for volume control and supports rotary input (crown/bezel).
+3. Added an "Output Switcher" button that launches the system audio output switcher.
+4. Updated `EpisodeDetailActivity` to launch the new volume control screen instead of the system volume UI.
+5. Added necessary string resources in `ui/i18n`.
+6. Registered the new activity in the manifest.
+
+Verified the build, lint, and ktlint. Ran relevant tests in `:model` and `:net:sync:wear-interface`.

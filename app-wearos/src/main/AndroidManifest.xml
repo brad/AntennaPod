@@ -45,6 +45,11 @@
             android:exported="false"
             android:taskAffinity=".wearos" />
 
+        <activity
+            android:name="de.danoeh.antennapod.wearos.VolumeControlActivity"
+            android:exported="false"
+            android:taskAffinity=".wearos" />
+
         <service
             android:name="de.danoeh.antennapod.wearos.sync.WearDataListenerService"
             android:exported="true">
