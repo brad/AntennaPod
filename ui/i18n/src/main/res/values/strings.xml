@@ -1055,6 +1055,6 @@
     <string name="pref_wearos_sum">Install or manage the Wear OS companion app</string>
     <string name="volume_label" tools:ignore="UnusedResources">Volume</string>
     <string name="output_switcher_label" tools:ignore="UnusedResources">Output</string>
-    <string name="volume_louder_label">Volume louder</string>
-    <string name="volume_quieter_label">Volume quieter</string>
+    <string name="volume_louder_label" tools:ignore="UnusedResources">Volume louder</string>
+    <string name="volume_quieter_label" tools:ignore="UnusedResources">Volume quieter</string>
 </resources>
