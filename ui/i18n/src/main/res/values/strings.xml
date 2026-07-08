@@ -1053,6 +1053,5 @@
     <string name="wearos_open_on_phone" tools:ignore="UnusedResources">Open on phone</string>
     <string name="pref_wearos_label">Wear OS</string>
     <string name="pref_wearos_sum">Install or manage the Wear OS companion app</string>
-    <string name="volume_label">Volume</string>
     <string name="output_switcher_label">Output</string>
 </resources>
