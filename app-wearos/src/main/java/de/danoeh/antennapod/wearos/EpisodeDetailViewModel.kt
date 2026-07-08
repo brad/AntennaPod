@@ -10,6 +10,7 @@ import de.danoeh.antennapod.model.feed.FeedItem
 import de.danoeh.antennapod.net.sync.wearinterface.WearDataPaths
 import de.danoeh.antennapod.wearos.sync.WearDataRepository
 import de.danoeh.antennapod.wearos.sync.WearMessageSender
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -73,13 +74,13 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
                 if (_uiState.value.isCurrentlyPlaying) {
                     _uiState.update {
                         if (it.position < it.duration || it.duration == 0) {
-                            it.copy(position = it.position + 1000)
+                            it.copy(position = it.position + 100)
                         } else {
                             it
                         }
                     }
                 }
-                delay(1.seconds)
+                delay(100.milliseconds)
             }
         }
     }
@@ -95,10 +96,12 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
     }
 
     fun skipForward() {
+        _uiState.update { it.copy(position = it.position + 10000) }
         viewModelScope.launch(Dispatchers.IO) { WearMessageSender.send(getApplication(), WearDataPaths.SKIP_FORWARD) }
     }
 
     fun skipBackward() {
+        _uiState.update { it.copy(position = Math.max(0, it.position - 10000)) }
         viewModelScope.launch(Dispatchers.IO) { WearMessageSender.send(getApplication(), WearDataPaths.SKIP_BACKWARD) }
     }
 
