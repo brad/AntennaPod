@@ -1,0 +1,72 @@
+diff --git a/app-wearos/src/main/java/de/danoeh/antennapod/wearos/EpisodeDetailActivity.kt b/app-wearos/src/main/java/de/danoeh/antennapod/wearos/EpisodeDetailActivity.kt
+index fb97da9..31771c4 100644
+--- a/app-wearos/src/main/java/de/danoeh/antennapod/wearos/EpisodeDetailActivity.kt
++++ b/app-wearos/src/main/java/de/danoeh/antennapod/wearos/EpisodeDetailActivity.kt
+@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
+ import androidx.core.content.IntentCompat
+ import androidx.lifecycle.ViewModelProvider
+ import androidx.wear.compose.material3.Button
++import androidx.wear.compose.material3.CircularProgressIndicator
+ import androidx.wear.compose.material3.Icon
+ import androidx.wear.compose.material3.IconButton
+ import androidx.wear.compose.material3.IconButtonDefaults
+@@ -144,29 +145,37 @@ fun EpisodeDetailScreen(
+                     )
+                 }
+
+-                IconButton(
+-                    onClick = if (uiState.isCurrentlyPlaying) onPause else onPlay,
+-                    modifier = Modifier.size(64.dp),
+-                    colors = IconButtonDefaults.filledIconButtonColors()
+-                ) {
+-                    Icon(
+-                        painter = painterResource(
+-                            if (uiState.isCurrentlyPlaying) {
+-                                CommonR.drawable.ic_pause_black
+-                            } else {
+-                                CommonR.drawable.ic_play_48dp_black
+-                            }
+-                        ),
+-                        contentDescription = stringResource(
+-                            if (uiState.isCurrentlyPlaying) {
+-                                CommonR.string.pause_label
+-                            } else {
+-                                CommonR.string.play_label
+-                            }
+-                        ),
+-                        modifier = Modifier.fillMaxSize(0.6f),
+-                        tint = MaterialTheme.colorScheme.onPrimary
++                Box(contentAlignment = Alignment.Center) {
++                    CircularProgressIndicator(
++                        progress = {
++                            if (uiState.duration > 0) uiState.position.toFloat() / uiState.duration else 0f
++                        },
++                        modifier = Modifier.size(72.dp)
+                     )
++                    IconButton(
++                        onClick = if (uiState.isCurrentlyPlaying) onPause else onPlay,
++                        modifier = Modifier.size(64.dp),
++                        colors = IconButtonDefaults.filledIconButtonColors()
++                    ) {
++                        Icon(
++                            painter = painterResource(
++                                if (uiState.isCurrentlyPlaying) {
++                                    CommonR.drawable.ic_pause_black
++                                } else {
++                                    CommonR.drawable.ic_play_48dp_black
++                                }
++                            ),
++                            contentDescription = stringResource(
++                                if (uiState.isCurrentlyPlaying) {
++                                    CommonR.string.pause_label
++                                } else {
++                                    CommonR.string.play_label
++                                }
++                            ),
++                            modifier = Modifier.fillMaxSize(0.6f),
++                            tint = MaterialTheme.colorScheme.onPrimary
++                        )
++                    }
+                 }
+
+                 IconButton(

@@ -1,0 +1,61 @@
+--- app-wearos/src/main/java/de/danoeh/antennapod/wearos/EpisodeDetailActivity.kt
++++ app-wearos/src/main/java/de/danoeh/antennapod/wearos/EpisodeDetailActivity.kt
+@@ -21,6 +21,7 @@
+ import androidx.wear.compose.material3.Button
++import androidx.wear.compose.material3.CircularProgressIndicator
+ import androidx.wear.compose.material3.Icon
+@@ -128,32 +129,36 @@
+                     )
+                 }
+
+-                IconButton(
+-                    onClick = if (uiState.isCurrentlyPlaying) onPause else onPlay,
+-                    modifier = Modifier.size(64.dp),
+-                    colors = IconButtonDefaults.filledIconButtonColors()
+-                ) {
+-                    Icon(
+-                        painter = painterResource(
+-                            if (uiState.isCurrentlyPlaying) {
+-                                CommonR.drawable.ic_pause_black
+-                            } else {
+-                                CommonR.drawable.ic_play_48dp_black
+-                            }
+-                        ),
+-                        contentDescription = stringResource(
+-                            if (uiState.isCurrentlyPlaying) {
+-                                CommonR.string.pause_label
+-                            } else {
+-                                CommonR.string.play_label
+-                            }
+-                        ),
+-                        modifier = Modifier.fillMaxSize(0.6f),
+-                        tint = MaterialTheme.colorScheme.onPrimary
+-                    )
++                Box(contentAlignment = Alignment.Center) {
++                    IconButton(
++                        onClick = if (uiState.isCurrentlyPlaying) onPause else onPlay,
++                        modifier = Modifier.size(64.dp),
++                        colors = IconButtonDefaults.filledIconButtonColors()
++                    ) {
++                        Icon(
++                            painter = painterResource(
++                                if (uiState.isCurrentlyPlaying) {
++                                    CommonR.drawable.ic_pause_black
++                                } else {
++                                    CommonR.drawable.ic_play_48dp_black
++                                }
++                            ),
++                            contentDescription = stringResource(
++                                if (uiState.isCurrentlyPlaying) {
++                                    CommonR.string.pause_label
++                                } else {
++                                    CommonR.string.play_label
++                                }
++                            ),
++                            modifier = Modifier.fillMaxSize(0.6f),
++                            tint = MaterialTheme.colorScheme.onPrimary
++                        )
++                    }
+                 }
+
+                 IconButton(
