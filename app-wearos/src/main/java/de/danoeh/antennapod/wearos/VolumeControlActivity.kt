@@ -1,21 +1,18 @@
 package de.danoeh.antennapod.wearos
 
-import android.content.Context
-import android.content.Intent
-import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -24,79 +21,87 @@ import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
-import androidx.wear.compose.material3.Stepper
+import androidx.wear.compose.material3.IconButton
 import androidx.wear.compose.material3.Text
 import de.danoeh.antennapod.ui.common.R as CommonR
 
 class VolumeControlActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel = ViewModelProvider(this)[VolumeControlViewModel::class.java]
         setContent {
             AntennaPodTheme {
-                VolumeControlScreen(
-                    onLaunchOutputSwitcher = {
-                        val intent = Intent("com.google.android.wearable.action.LAUNCH_OUTPUT_SWITCHER")
-                        intent.putExtra("com.google.android.wearable.extra.EXTRA_PACKAGE_NAME", packageName)
-                        startActivity(intent)
-                    }
-                )
+                VolumeControlScreen(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun VolumeControlScreen(onLaunchOutputSwitcher: () -> Unit) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-    var volume by remember {
-        mutableIntStateOf(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC))
-    }
-
+fun VolumeControlScreen(viewModel: VolumeControlViewModel) {
+    val uiState by viewModel.volumeState.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .onRotaryScrollEvent {
-                val delta = if (it.verticalScrollPixels > 0) 1 else -1
-                val newVolume = (volume + delta).coerceIn(0, maxVolume)
-                if (newVolume != volume) {
-                    volume = newVolume
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+                if (it.verticalScrollPixels > 0) {
+                    viewModel.volumeUp()
+                } else {
+                    viewModel.volumeDown()
                 }
                 true
             }
             .focusRequester(focusRequester),
         contentAlignment = Alignment.Center
     ) {
-        Stepper(
-            value = volume,
-            onValueChange = { newValue ->
-                volume = newValue
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0)
+        CircularProgressIndicator(
+            progress = {
+                if (uiState.maxVolume > 0) uiState.volume.toFloat() / uiState.maxVolume else 0f
             },
-            valueProgression = 0..maxVolume,
-            increaseIcon = { Icon(painterResource(CommonR.drawable.ic_add), contentDescription = "Increase") },
-            decreaseIcon = { Icon(painterResource(CommonR.drawable.ic_minus), contentDescription = "Decrease") }
-        ) {
-            Icon(
-                painter = painterResource(CommonR.drawable.ic_volume_adaption),
-                contentDescription = stringResource(CommonR.string.volume_label),
-                modifier = Modifier.size(24.dp)
-            )
-        }
-
-        Button(
-            onClick = onLaunchOutputSwitcher,
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+                .fillMaxSize()
+                .padding(2.dp),
+            strokeWidth = 4.dp
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(stringResource(CommonR.string.output_switcher_label))
+            IconButton(
+                onClick = { viewModel.volumeUp() },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(CommonR.drawable.ic_add),
+                    contentDescription = stringResource(CommonR.string.volume_louder_label),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Button(
+                onClick = { viewModel.switchOutput() }
+            ) {
+                Text(uiState.outputDevice.ifEmpty { stringResource(CommonR.string.output_switcher_label) })
+            }
+
+            IconButton(
+                onClick = { viewModel.volumeDown() },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(CommonR.drawable.ic_minus),
+                    contentDescription = stringResource(CommonR.string.volume_quieter_label),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 

@@ -24,6 +24,9 @@ public final class WearSerializer {
     private static final String KEY_IS_PLAYING = "is_playing";
     private static final String KEY_IMAGE_URL = "image_url";
     private static final String KEY_FEED_TITLE = "feed_title";
+    private static final String KEY_VOLUME = "volume";
+    private static final String KEY_MAX_VOLUME = "max_volume";
+    private static final String KEY_OUTPUT_DEVICE = "output_device";
 
     private WearSerializer() {
     }
@@ -128,10 +131,14 @@ public final class WearSerializer {
     }
 
     @NonNull
-    public static byte[] nowPlayingToBytes(@NonNull FeedItem item, boolean isPlaying) {
+    public static byte[] nowPlayingToBytes(@NonNull FeedItem item, boolean isPlaying,
+                                          int volume, int maxVolume, String outputDevice) {
         try {
             JSONObject obj = episodeToJson(item);
             obj.put(KEY_IS_PLAYING, isPlaying);
+            obj.put(KEY_VOLUME, volume);
+            obj.put(KEY_MAX_VOLUME, maxVolume);
+            obj.put(KEY_OUTPUT_DEVICE, outputDevice != null ? outputDevice : "");
             return obj.toString().getBytes(StandardCharsets.UTF_8);
         } catch (JSONException e) {
             return new byte[0];
@@ -147,7 +154,10 @@ public final class WearSerializer {
             JSONObject obj = new JSONObject(new String(data, StandardCharsets.UTF_8));
             FeedItem item = episodeFromJson(obj);
             boolean isPlaying = obj.optBoolean(KEY_IS_PLAYING, false);
-            return new WearNowPlaying(item, isPlaying);
+            int volume = obj.optInt(KEY_VOLUME, 0);
+            int maxVolume = obj.optInt(KEY_MAX_VOLUME, 0);
+            String outputDevice = obj.optString(KEY_OUTPUT_DEVICE, "");
+            return new WearNowPlaying(item, isPlaying, volume, maxVolume, outputDevice);
         } catch (JSONException e) {
             return null;
         }
