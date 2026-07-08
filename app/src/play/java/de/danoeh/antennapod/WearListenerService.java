@@ -1,5 +1,8 @@
 package de.danoeh.antennapod;
 
+import android.content.Context;
+import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.util.Log;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
@@ -42,6 +45,7 @@ public class WearListenerService extends WearableListenerService {
     }
 
     private void handleMessage(String path, String sourceNodeId) {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         switch (path) {
             case WearDataPaths.NOW_PLAYING:
                 FeedMedia media = DBReader.getFeedMedia(PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
@@ -55,7 +59,10 @@ public class WearListenerService extends WearableListenerService {
                 }
                 if (!PlaybackService.isRunning) {
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(nowPlayingItem, false));
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, false,
+                                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                    getActiveOutputDeviceName(audioManager)));
                     return;
                 }
                 PlaybackController.bindToMedia3Service(this, controller -> {
@@ -64,7 +71,10 @@ public class WearListenerService extends WearableListenerService {
                         media.setDuration((int) controller.getDuration());
                     }
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying()));
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying(),
+                                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                    getActiveOutputDeviceName(audioManager)));
                 });
                 break;
             case WearDataPaths.PAUSE:
@@ -79,6 +89,18 @@ public class WearListenerService extends WearableListenerService {
                 PlaybackController.bindToMedia3Service(this, controller -> {
                     controller.seekTo(Math.max(0, controller.getCurrentPosition() - 10000));
                 });
+                break;
+            case WearDataPaths.VOLUME_UP:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_SHOW_UI);
+                break;
+            case WearDataPaths.VOLUME_DOWN:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,
+                        AudioManager.FLAG_SHOW_UI);
+                break;
+            case WearDataPaths.SWITCH_OUTPUT:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME,
+                        AudioManager.FLAG_SHOW_UI);
                 break;
             case WearDataPaths.QUEUE:
                 List<FeedItem> queue = DBReader.getQueue();
@@ -137,6 +159,24 @@ public class WearListenerService extends WearableListenerService {
                 }
                 break;
         }
+    }
+
+    private String getActiveOutputDeviceName(AudioManager audioManager) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+            for (AudioDeviceInfo device : devices) {
+                if (device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP
+                        || device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                    return device.getProductName().toString();
+                }
+            }
+            for (AudioDeviceInfo device : devices) {
+                if (device.getType() == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                    return "Phone speaker";
+                }
+            }
+        }
+        return "Speaker";
     }
 
     private void playItem(long itemId) {

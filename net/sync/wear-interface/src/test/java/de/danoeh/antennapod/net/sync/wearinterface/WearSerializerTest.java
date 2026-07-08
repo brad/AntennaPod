@@ -124,7 +124,7 @@ public class WearSerializerTest {
         FeedMedia media = new FeedMedia(0, item, 7200000, 120000, 0, null, null, null, 0, null, 0, 0L);
         item.setMedia(media);
 
-        byte[] bytes = WearSerializer.nowPlayingToBytes(item, true);
+        byte[] bytes = WearSerializer.nowPlayingToBytes(item, true, 5, 15, "Bluetooth Speaker");
         WearNowPlaying result = WearSerializer.nowPlayingFromBytes(bytes);
 
         assertTrue(result != null);
@@ -133,6 +133,9 @@ public class WearSerializerTest {
         assertEquals(7200000, result.item.getMedia().getDuration());
         assertEquals(120000, result.item.getMedia().getPosition());
         assertTrue(result.isPlaying);
+        assertEquals(5, result.volume);
+        assertEquals(15, result.maxVolume);
+        assertEquals("Bluetooth Speaker", result.outputDevice);
     }
 
     @Test
