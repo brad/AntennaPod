@@ -138,7 +138,7 @@ fun EpisodeDetailScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        painter = painterResource(CommonR.drawable.ic_replay),
+                        painter = painterResource(CommonR.drawable.ic_fast_rewind),
                         contentDescription = stringResource(CommonR.string.rewind_label),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
