@@ -10,7 +10,6 @@ import de.danoeh.antennapod.model.feed.FeedItem
 import de.danoeh.antennapod.net.sync.wearinterface.WearDataPaths
 import de.danoeh.antennapod.wearos.sync.WearDataRepository
 import de.danoeh.antennapod.wearos.sync.WearMessageSender
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,6 +21,8 @@ import kotlinx.coroutines.launch
 
 data class EpisodeDetailUiState(
     val item: FeedItem,
+    val title: String = "",
+    val feedTitle: String = "",
     val position: Int = 0,
     val duration: Int = 0,
     val isCurrentlyPlaying: Boolean = false
@@ -31,6 +32,8 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
     private val _uiState = MutableStateFlow(
         EpisodeDetailUiState(
             item = episode,
+            title = episode.title ?: "",
+            feedTitle = episode.feed?.title ?: "",
             position = episode.media?.position ?: 0,
             duration = episode.media?.duration ?: 0
         )
@@ -52,7 +55,15 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
                 val duration = liveData?.item?.media?.duration?.takeIf { it > 0 } ?: episode.media?.duration ?: 0
                 val isCurrentlyPlaying = liveData?.isPlaying == true
                 _uiState.update {
-                    it.copy(position = position, duration = duration, isCurrentlyPlaying = isCurrentlyPlaying)
+                    val newItem = liveData?.item ?: it.item
+                    it.copy(
+                        item = newItem,
+                        title = newItem.title ?: "",
+                        feedTitle = newItem.feed?.title ?: "",
+                        position = position,
+                        duration = duration,
+                        isCurrentlyPlaying = isCurrentlyPlaying
+                    )
                 }
             }
         }
@@ -61,14 +72,14 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
             while (isActive) {
                 if (_uiState.value.isCurrentlyPlaying) {
                     _uiState.update {
-                        if (it.position < it.duration) {
-                            it.copy(position = it.position + 100)
+                        if (it.position < it.duration || it.duration == 0) {
+                            it.copy(position = it.position + 1000)
                         } else {
                             it
                         }
                     }
                 }
-                delay(100.milliseconds)
+                delay(1.seconds)
             }
         }
     }

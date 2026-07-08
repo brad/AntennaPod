@@ -64,7 +64,7 @@ public class WearListenerService extends WearableListenerService {
                         media.setDuration((int) controller.getDuration());
                     }
                     reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                            WearSerializer.nowPlayingToBytes(nowPlayingItem, true));
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying()));
                 });
                 break;
             case WearDataPaths.PAUSE:
