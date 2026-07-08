@@ -1,7 +1,6 @@
 package de.danoeh.antennapod.wearos
 
 import android.content.Context
-import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
