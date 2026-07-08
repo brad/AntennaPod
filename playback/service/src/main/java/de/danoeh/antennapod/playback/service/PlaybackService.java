@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.graphics.Bitmap;
 import android.app.UiModeManager;
 import android.bluetooth.BluetoothA2dp;
 import android.content.BroadcastReceiver;
@@ -1429,7 +1430,10 @@ public class PlaybackService extends MediaBrowserServiceCompat {
 
 
         if (notificationBuilder.isIconCached()) {
-            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, notificationBuilder.getCachedIcon());
+            Bitmap icon = notificationBuilder.getCachedIcon();
+            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, icon);
+            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, icon);
+            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, icon);
         } else {
             String iconUri = p.getImageLocation();
             if (p instanceof FeedMedia) { // Don't use embedded cover etc, which Android can't load
@@ -1444,6 +1448,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
                 }
             }
             if (!TextUtils.isEmpty(iconUri)) {
+                builder.putString(MediaMetadataCompat.METADATA_KEY_ART_URI, iconUri);
+                builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, iconUri);
                 builder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, iconUri);
             }
         }
