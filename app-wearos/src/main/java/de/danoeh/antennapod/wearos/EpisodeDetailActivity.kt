@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.MarqueeAnimationMode
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +43,6 @@ import androidx.wear.compose.material3.Text
 import coil.compose.AsyncImage
 import de.danoeh.antennapod.model.feed.FeedItem
 import de.danoeh.antennapod.ui.common.R as CommonR
-import de.danoeh.antennapod.ui.notifications.R as NotificationsR
 import de.danoeh.antennapod.wearos.composable.ListItem
 
 class EpisodeDetailActivity : ComponentActivity() {
@@ -180,70 +180,54 @@ fun EpisodeDetailScreen(
                     )
                 }
             }
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                IconButton(
-                    onClick = {
-                        context.startActivity(
-                            Intent("com.google.android.wearable.action.LAUNCH_OUTPUT_SWITCHER")
-                                .putExtra(
-                                    "com.google.android.wearable.extra.PACKAGE_NAME",
-                                    context.packageName
-                                )
-                        )
-                    },
-                    modifier = Modifier.size(32.dp),
-                    colors = IconButtonDefaults.filledTonalIconButtonColors()
-                ) {
-                    Icon(
-                        painter = painterResource(NotificationsR.drawable.ic_notification_stream),
-                        contentDescription = "Audio Output",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                IconButton(
-                    onClick = {
-                        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                        audioManager.adjustStreamVolume(
-                            AudioManager.STREAM_MUSIC,
-                            AudioManager.ADJUST_SAME,
-                            AudioManager.FLAG_SHOW_UI
-                        )
-                    },
-                    modifier = Modifier.size(32.dp),
-                    colors = IconButtonDefaults.filledTonalIconButtonColors()
-                ) {
-                    Icon(
-                        painter = painterResource(CommonR.drawable.ic_volume_adaption),
-                        contentDescription = "Volume",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+        IconButton(
+            onClick = {
+                val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                audioManager.adjustStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.ADJUST_SAME,
+                    AudioManager.FLAG_SHOW_UI
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(bottom = 8.dp, start = 8.dp)
+                .size(40.dp)
+        ) {
+            Icon(
+                painter = painterResource(CommonR.drawable.ic_volume_adaption),
+                contentDescription = "Volume",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
         }
 
         IconButton(
             onClick = { showBottomSheet = true },
-            modifier = Modifier.align(Alignment.BottomCenter).size(32.dp)
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 8.dp, end = 8.dp)
+                .size(40.dp)
         ) {
             Icon(
-                painter = painterResource(CommonR.drawable.ic_arrow_full_up),
-                contentDescription = "Open drawer",
+                painter = painterResource(CommonR.drawable.dots_vertical),
+                contentDescription = "More",
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
         if (showBottomSheet) {
             Box(
-                modifier = Modifier.fillMaxSize().alpha(0.95f),
-                contentAlignment = Alignment.BottomCenter
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.95f)),
+                contentAlignment = Alignment.Center
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ListItem(
@@ -256,7 +240,9 @@ fun EpisodeDetailScreen(
                     )
                     Button(
                         onClick = { showBottomSheet = false },
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
                     ) {
                         Text(stringResource(CommonR.string.close_label))
                     }
