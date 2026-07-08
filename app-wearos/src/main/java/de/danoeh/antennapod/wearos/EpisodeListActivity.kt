@@ -61,6 +61,7 @@ fun EpisodeListScreen(uiState: EpisodeListUiState, onOpenEpisodeDetail: (FeedIte
         items(episodes!!) { episode ->
             ListItem(
                 text = episode.title ?: "",
+                imageUrl = episode.imageUrl,
                 onClick = { onOpenEpisodeDetail(episode) }
             )
         }

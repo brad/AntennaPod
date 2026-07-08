@@ -96,6 +96,7 @@ fun MainListScreen(
                 if (uiState.nowPlaying != null) {
                     ListItem(
                         text = uiState.nowPlaying.item.title ?: "",
+                        imageUrl = uiState.nowPlaying.item.imageUrl,
                         onClick = { onOpenEpisodeDetail(uiState.nowPlaying.item) }
                     )
                 } else {
