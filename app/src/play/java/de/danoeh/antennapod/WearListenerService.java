@@ -186,6 +186,7 @@ public class WearListenerService extends WearableListenerService {
     }
 
     private void sendNowPlayingInfo(String sourceNodeId) {
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         FeedMedia media = DBReader.getFeedMedia(PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
         if (media == null) {
             return;
@@ -197,7 +198,10 @@ public class WearListenerService extends WearableListenerService {
         }
         if (!PlaybackService.isRunning) {
             reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                    WearSerializer.nowPlayingToBytes(nowPlayingItem, false));
+                    WearSerializer.nowPlayingToBytes(nowPlayingItem, false,
+                                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                    getActiveOutputDeviceName(audioManager)));
             return;
         }
         PlaybackController.bindToMedia3Service(this, controller -> {
@@ -206,7 +210,10 @@ public class WearListenerService extends WearableListenerService {
                 media.setDuration((int) controller.getDuration());
             }
             reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
-                    WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying()));
+                    WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying(),
+                                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                    getActiveOutputDeviceName(audioManager)));
         });
     }
 
