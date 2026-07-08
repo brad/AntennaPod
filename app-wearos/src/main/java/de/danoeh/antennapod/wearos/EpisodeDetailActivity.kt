@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +38,7 @@ import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
@@ -63,7 +63,7 @@ class EpisodeDetailActivity : ComponentActivity() {
 
         setContent {
             AntennaPodTheme {
-                val uiState by viewModel.uiState.collectAsState()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 EpisodeDetailScreen(
                     uiState = uiState,
                     onPlay = { viewModel.play() },
@@ -94,7 +94,7 @@ fun EpisodeDetailScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (item.imageUrl != null) {
@@ -115,9 +115,9 @@ fun EpisodeDetailScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            key(item.id, lifecycleState == Lifecycle.State.RESUMED) {
+            key(uiState.item.id, lifecycleState == Lifecycle.State.RESUMED) {
                 Text(
-                    text = item.title,
+                    text = uiState.title,
                     modifier = Modifier
                         .fillMaxWidth()
                         .basicMarquee(animationMode = MarqueeAnimationMode.Immediately),
@@ -127,7 +127,7 @@ fun EpisodeDetailScreen(
                 )
 
                 Text(
-                    text = item.feed?.title ?: "",
+                    text = uiState.feedTitle,
                     modifier = Modifier
                         .fillMaxWidth()
                         .basicMarquee(animationMode = MarqueeAnimationMode.Immediately),
@@ -150,6 +150,7 @@ fun EpisodeDetailScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
+                        modifier = Modifier.size(24.dp),
                         painter = painterResource(CommonR.drawable.ic_fast_rewind),
                         contentDescription = stringResource(CommonR.string.rewind_label),
                         tint = MaterialTheme.colorScheme.onSurface
@@ -162,6 +163,7 @@ fun EpisodeDetailScreen(
                             if (uiState.duration > 0) uiState.position.toFloat() / uiState.duration else 0f
                         },
                         modifier = Modifier.size(72.dp),
+                        strokeWidth = 2.dp,
                         colors = ProgressIndicatorDefaults.colors(indicatorColor = Color(0xFF00BFFF))
                     )
                     IconButton(
@@ -179,6 +181,7 @@ fun EpisodeDetailScreen(
                             CommonR.string.play_label
                         }
                         Icon(
+                            modifier = Modifier.size(24.dp),
                             painter = painterResource(iconRes),
                             contentDescription = stringResource(labelRes),
                             tint = MaterialTheme.colorScheme.onSurface
@@ -191,6 +194,7 @@ fun EpisodeDetailScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
+                        modifier = Modifier.size(24.dp),
                         painter = painterResource(CommonR.drawable.ic_fast_forward),
                         contentDescription = stringResource(CommonR.string.fast_forward_label),
                         tint = MaterialTheme.colorScheme.onSurface
@@ -217,6 +221,7 @@ fun EpisodeDetailScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
+                        modifier = Modifier.size(24.dp),
                         painter = painterResource(CommonR.drawable.ic_volume_adaption),
                         contentDescription = "Volume",
                         tint = MaterialTheme.colorScheme.onSurface
@@ -230,6 +235,7 @@ fun EpisodeDetailScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
+                        modifier = Modifier.size(24.dp),
                         painter = painterResource(CommonR.drawable.dots_vertical),
                         contentDescription = "More",
                         tint = MaterialTheme.colorScheme.onSurface
