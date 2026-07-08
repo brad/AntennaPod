@@ -36,7 +36,7 @@ fun ListItem(text: String, @DrawableRes iconRes: Int? = null, onClick: () -> Uni
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            Text(text = text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(text = text, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         }
     }
 }
