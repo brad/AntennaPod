@@ -118,21 +118,25 @@ fun EpisodeDetailScreen(
                     text = uiState.title,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
                         .basicMarquee(animationMode = MarqueeAnimationMode.Immediately),
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
-                    maxLines = 1
+                    maxLines = 1,
+                    softWrap = false
                 )
 
                 Text(
                     text = uiState.feedTitle,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
                         .basicMarquee(animationMode = MarqueeAnimationMode.Immediately),
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Normal),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    maxLines = 1
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
 
