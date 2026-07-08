@@ -164,7 +164,7 @@ fun EpisodeDetailScreen(
                         progress = {
                             if (uiState.duration > 0) uiState.position.toFloat() / uiState.duration else 0f
                         },
-                        modifier = Modifier.size(72.dp),
+                        modifier = Modifier.size(64.dp),
                         strokeWidth = 2.dp,
                         colors = ProgressIndicatorDefaults.colors(indicatorColor = Color(0xFF00BFFF))
                     )
