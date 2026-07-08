@@ -15,6 +15,7 @@ import de.danoeh.antennapod.model.feed.Feed;
 import de.danoeh.antennapod.model.feed.FeedItem;
 import de.danoeh.antennapod.model.feed.FeedItemFilter;
 import de.danoeh.antennapod.model.feed.SortOrder;
+
 import android.content.Intent;
 import de.danoeh.antennapod.playback.service.PlaybackController;
 import de.danoeh.antennapod.ui.appstartintent.MainActivityStarter;
@@ -104,10 +105,7 @@ public class WearListenerService extends WearableListenerService {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,
                         AudioManager.FLAG_SHOW_UI);
                 break;
-            case WearDataPaths.SWITCH_OUTPUT:
-                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME,
-                        AudioManager.FLAG_SHOW_UI);
-                break;
+
             case WearDataPaths.QUEUE:
                 List<FeedItem> queue = DBReader.getQueue();
                 populateImages(queue);
