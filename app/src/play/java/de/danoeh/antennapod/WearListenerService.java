@@ -76,18 +76,24 @@ public class WearListenerService extends WearableListenerService {
                                     audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
                                     getActiveOutputDeviceName(audioManager)));
                 });
+                sendNowPlayingInfo(sourceNodeId);
                 break;
             case WearDataPaths.PAUSE:
-                PlaybackController.bindToMedia3Service(this, controller -> controller.pause());
+                PlaybackController.bindToMedia3Service(this, controller -> {
+                    controller.pause();
+                    sendNowPlayingInfo(sourceNodeId);
+                });
                 break;
             case WearDataPaths.SKIP_FORWARD:
                 PlaybackController.bindToMedia3Service(this, controller -> {
                     controller.seekTo(controller.getCurrentPosition() + 10000);
+                    sendNowPlayingInfo(sourceNodeId);
                 });
                 break;
             case WearDataPaths.SKIP_BACKWARD:
                 PlaybackController.bindToMedia3Service(this, controller -> {
                     controller.seekTo(Math.max(0, controller.getCurrentPosition() - 10000));
+                    sendNowPlayingInfo(sourceNodeId);
                 });
                 break;
             case WearDataPaths.VOLUME_UP:
@@ -126,7 +132,7 @@ public class WearListenerService extends WearableListenerService {
                 if (path.startsWith(WearDataPaths.PLAY_PREFIX)) {
                     try {
                         long itemId = Long.parseLong(path.substring(WearDataPaths.PLAY_PREFIX.length()));
-                        playItem(itemId);
+                        playItem(itemId, sourceNodeId);
                     } catch (NumberFormatException e) {
                         Log.w(TAG, "Ignoring malformed play path: " + path, e);
                     }
@@ -179,7 +185,32 @@ public class WearListenerService extends WearableListenerService {
         return "Speaker";
     }
 
-    private void playItem(long itemId) {
+    private void sendNowPlayingInfo(String sourceNodeId) {
+        FeedMedia media = DBReader.getFeedMedia(PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
+        if (media == null) {
+            return;
+        }
+        FeedItem nowPlayingItem = media.getItem();
+        if (nowPlayingItem != null && nowPlayingItem.getFeed() == null) {
+            nowPlayingItem.setFeed(DBReader.getFeed(nowPlayingItem.getFeedId(), false, 0, 0));
+            nowPlayingItem.setImageUrl(nowPlayingItem.getImageLocation());
+        }
+        if (!PlaybackService.isRunning) {
+            reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
+                    WearSerializer.nowPlayingToBytes(nowPlayingItem, false));
+            return;
+        }
+        PlaybackController.bindToMedia3Service(this, controller -> {
+            media.setPosition((int) controller.getCurrentPosition());
+            if (controller.getDuration() > 0) {
+                media.setDuration((int) controller.getDuration());
+            }
+            reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
+                    WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying()));
+        });
+    }
+
+    private void playItem(long itemId, String sourceNodeId) {
         FeedItem item = DBReader.getFeedItem(itemId);
         if (item == null || item.getMedia() == null) {
             Log.w(TAG, "Item or media not found for id " + itemId);
@@ -189,6 +220,7 @@ public class WearListenerService extends WearableListenerService {
         new PlaybackServiceStarter(this, item.getMedia())
                 .callEvenIfRunning(true)
                 .start();
+        sendNowPlayingInfo(sourceNodeId);
     }
 
     private void reply(String nodeId, String path, byte[] payload) {
