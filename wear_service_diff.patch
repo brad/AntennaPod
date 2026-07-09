@@ -1,0 +1,67 @@
+<<<<<<< SEARCH
+            case WearDataPaths.NOW_PLAYING:
+                FeedMedia media = DBReader.getFeedMedia(PlaybackPreferences.getCurrentlyPlayingFeedMediaId());
+                if (media == null) {
+                    return;
+                }
+                FeedItem nowPlayingItem = media.getItem();
+                if (nowPlayingItem != null && nowPlayingItem.getFeed() == null) {
+                    nowPlayingItem.setFeed(DBReader.getFeed(nowPlayingItem.getFeedId(), false, 0, 0));
+                    nowPlayingItem.setImageUrl(nowPlayingItem.getImageLocation());
+                }
+                if (!PlaybackService.isRunning) {
+                    reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, false,
+                                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                    getActiveOutputDeviceName(audioManager)));
+                    return;
+                }
+                PlaybackController.bindToMedia3Service(this, controller -> {
+                    media.setPosition((int) controller.getCurrentPosition());
+                    if (controller.getDuration() > 0) {
+                        media.setDuration((int) controller.getDuration());
+                    }
+                    reply(sourceNodeId, WearDataPaths.NOW_PLAYING,
+                            WearSerializer.nowPlayingToBytes(nowPlayingItem, controller.isPlaying(),
+                                    audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
+                                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                                    getActiveOutputDeviceName(audioManager)));
+                });
+                sendNowPlayingInfo(sourceNodeId);
+                break;
+=======
+            case WearDataPaths.NOW_PLAYING:
+                sendNowPlayingInfo(sourceNodeId);
+                break;
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            case WearDataPaths.VOLUME_UP:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_SHOW_UI);
+                break;
+            case WearDataPaths.VOLUME_DOWN:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,
+                        AudioManager.FLAG_SHOW_UI);
+                break;
+            case WearDataPaths.SWITCH_OUTPUT:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME,
+                        AudioManager.FLAG_SHOW_UI);
+                break;
+=======
+            case WearDataPaths.VOLUME_UP:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_SHOW_UI);
+                sendNowPlayingInfo(sourceNodeId);
+                break;
+            case WearDataPaths.VOLUME_DOWN:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,
+                        AudioManager.FLAG_SHOW_UI);
+                sendNowPlayingInfo(sourceNodeId);
+                break;
+            case WearDataPaths.SWITCH_OUTPUT:
+                audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME,
+                        AudioManager.FLAG_SHOW_UI);
+                sendNowPlayingInfo(sourceNodeId);
+                break;
+>>>>>>> REPLACE

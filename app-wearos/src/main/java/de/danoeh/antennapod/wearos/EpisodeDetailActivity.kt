@@ -1,8 +1,10 @@
 package de.danoeh.antennapod.wearos
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,7 +92,7 @@ fun EpisodeDetailScreen(
     onOpenOnPhone: () -> Unit
 ) {
     val item = uiState.item
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     var showBottomSheet by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
@@ -160,10 +163,13 @@ fun EpisodeDetailScreen(
                 }
 
                 Box(contentAlignment = Alignment.Center) {
+                    val progress = if (uiState.duration > 0) uiState.position.toFloat() / uiState.duration else 0f
+                    val animatedProgress by animateFloatAsState(
+                        targetValue = progress.coerceIn(0f, 1f),
+                        label = "PlaybackProgress"
+                    )
                     CircularProgressIndicator(
-                        progress = {
-                            if (uiState.duration > 0) uiState.position.toFloat() / uiState.duration else 0f
-                        },
+                        progress = { animatedProgress },
                         modifier = Modifier.size(64.dp),
                         strokeWidth = 2.dp,
                         colors = ProgressIndicatorDefaults.colors(indicatorColor = Color(0xFF00BFFF))

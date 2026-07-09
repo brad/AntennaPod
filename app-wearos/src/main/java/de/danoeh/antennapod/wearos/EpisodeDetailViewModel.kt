@@ -51,20 +51,25 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
 
         viewModelScope.launch {
             WearDataRepository.nowPlaying.collect { nowPlaying ->
-                val liveData = nowPlaying?.takeIf { it.item.id == episode.id }
-                val position = liveData?.item?.media?.position ?: episode.media?.position ?: 0
-                val duration = liveData?.item?.media?.duration?.takeIf { it > 0 } ?: episode.media?.duration ?: 0
-                val isCurrentlyPlaying = liveData?.isPlaying == true
-                _uiState.update {
-                    val newItem = liveData?.item ?: it.item
-                    it.copy(
-                        item = newItem,
-                        title = newItem.title ?: "",
-                        feedTitle = newItem.feed?.title ?: "",
-                        position = position,
-                        duration = duration,
-                        isCurrentlyPlaying = isCurrentlyPlaying
-                    )
+                if (nowPlaying == null) return@collect
+                val isMatchingEpisode = nowPlaying.item.id == episode.id
+
+                _uiState.update { currentState ->
+                    if (isMatchingEpisode) {
+                        val newItem = nowPlaying.item
+                        val position = newItem.media?.position ?: currentState.position
+                        val duration = newItem.media?.duration?.takeIf { it > 0 } ?: currentState.duration
+                        currentState.copy(
+                            item = newItem,
+                            title = newItem.title ?: currentState.title,
+                            feedTitle = newItem.feed?.title ?: currentState.feedTitle,
+                            position = position,
+                            duration = duration,
+                            isCurrentlyPlaying = nowPlaying.isPlaying
+                        )
+                    } else {
+                        currentState.copy(isCurrentlyPlaying = false)
+                    }
                 }
             }
         }
