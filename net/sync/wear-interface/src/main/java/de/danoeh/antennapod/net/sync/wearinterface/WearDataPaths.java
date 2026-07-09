@@ -14,7 +14,6 @@ public final class WearDataPaths {
     public static final String SKIP_BACKWARD = "/skip_backward";
     public static final String VOLUME_UP = "/volume_up";
     public static final String VOLUME_DOWN = "/volume_down";
-    public static final String SWITCH_OUTPUT = "/switch_output";
 
     public static String playPath(long itemId) {
         return PLAY_PREFIX + itemId;
