@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ class VolumeControlActivity : ComponentActivity() {
 fun VolumeControlScreen(viewModel: VolumeControlViewModel) {
     val uiState by viewModel.volumeState.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -87,7 +89,7 @@ fun VolumeControlScreen(viewModel: VolumeControlViewModel) {
             }
 
             Button(
-                onClick = { viewModel.switchOutput() }
+                onClick = { viewModel.switchOutput(context) }
             ) {
                 Text(uiState.outputDevice.ifEmpty { stringResource(CommonR.string.output_switcher_label) })
             }
