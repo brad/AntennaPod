@@ -80,7 +80,7 @@ fun VolumeControlScreen(viewModel: VolumeControlViewModel) {
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
-                    painter = painterResource(CommonR.drawable.ic_add),
+                    painter = painterResource(CommonR.drawable.ic_volume_up),
                     contentDescription = stringResource(CommonR.string.volume_louder_label),
                     modifier = Modifier.size(24.dp)
                 )
@@ -97,7 +97,7 @@ fun VolumeControlScreen(viewModel: VolumeControlViewModel) {
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
-                    painter = painterResource(CommonR.drawable.ic_minus),
+                    painter = painterResource(CommonR.drawable.ic_volume_down),
                     contentDescription = stringResource(CommonR.string.volume_quieter_label),
                     modifier = Modifier.size(24.dp)
                 )
