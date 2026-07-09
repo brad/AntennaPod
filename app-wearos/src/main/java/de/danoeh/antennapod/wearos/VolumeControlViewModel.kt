@@ -7,32 +7,45 @@ import de.danoeh.antennapod.net.sync.wearinterface.WearDataPaths
 import de.danoeh.antennapod.wearos.sync.WearDataRepository
 import de.danoeh.antennapod.wearos.sync.WearMessageSender
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class VolumeControlViewModel(application: Application) : AndroidViewModel(application) {
-    val volumeState: StateFlow<VolumeUiState> = WearDataRepository.nowPlaying.map { nowPlaying ->
-        VolumeUiState(
-            volume = nowPlaying?.volume ?: 0,
-            maxVolume = nowPlaying?.maxVolume ?: 15,
-            outputDevice = nowPlaying?.outputDevice ?: ""
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = VolumeUiState()
-    )
+    private val _volumeState = MutableStateFlow(VolumeUiState())
+    val volumeState: StateFlow<VolumeUiState> = _volumeState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            WearMessageSender.send(getApplication(), WearDataPaths.NOW_PLAYING)
+        }
+
+        viewModelScope.launch {
+            WearDataRepository.nowPlaying.collect { nowPlaying ->
+                if (nowPlaying != null) {
+                    _volumeState.update {
+                        it.copy(
+                            volume = nowPlaying.volume,
+                            maxVolume = nowPlaying.maxVolume,
+                            outputDevice = nowPlaying.outputDevice
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     fun volumeUp() {
+        _volumeState.update { it.copy(volume = (it.volume + 1).coerceAtMost(it.maxVolume)) }
         viewModelScope.launch(Dispatchers.IO) {
             WearMessageSender.send(getApplication(), WearDataPaths.VOLUME_UP)
         }
     }
 
     fun volumeDown() {
+        _volumeState.update { it.copy(volume = (it.volume - 1).coerceAtLeast(0)) }
         viewModelScope.launch(Dispatchers.IO) {
             WearMessageSender.send(getApplication(), WearDataPaths.VOLUME_DOWN)
         }

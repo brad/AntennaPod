@@ -71,14 +71,17 @@ public class WearListenerService extends WearableListenerService {
             case WearDataPaths.VOLUME_UP:
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE,
                         AudioManager.FLAG_SHOW_UI);
+                sendNowPlayingInfo(sourceNodeId);
                 break;
             case WearDataPaths.VOLUME_DOWN:
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER,
                         AudioManager.FLAG_SHOW_UI);
+                sendNowPlayingInfo(sourceNodeId);
                 break;
             case WearDataPaths.SWITCH_OUTPUT:
                 audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME,
                         AudioManager.FLAG_SHOW_UI);
+                sendNowPlayingInfo(sourceNodeId);
                 break;
             case WearDataPaths.QUEUE:
                 List<FeedItem> queue = DBReader.getQueue();
