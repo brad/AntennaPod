@@ -47,6 +47,7 @@ import androidx.wear.compose.material3.IconButton
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ProgressIndicatorDefaults
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TimeText
 import coil.compose.AsyncImage
 import de.danoeh.antennapod.model.feed.FeedItem
 import de.danoeh.antennapod.ui.common.R as CommonR
@@ -98,6 +99,7 @@ fun EpisodeDetailScreen(
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
+        TimeText()
         if (item.imageUrl != null) {
             AsyncImage(
                 model = item.imageUrl,
