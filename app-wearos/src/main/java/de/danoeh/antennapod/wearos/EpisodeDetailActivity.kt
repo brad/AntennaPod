@@ -170,7 +170,7 @@ fun EpisodeDetailScreen(
                     )
                     CircularProgressIndicator(
                         progress = { animatedProgress },
-                        modifier = Modifier.size(64.dp),
+                        modifier = Modifier.size(48.dp),
                         strokeWidth = 2.dp,
                         colors = ProgressIndicatorDefaults.colors(indicatorColor = Color(0xFF00BFFF))
                     )
