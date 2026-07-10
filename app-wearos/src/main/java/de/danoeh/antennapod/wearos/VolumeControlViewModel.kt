@@ -3,6 +3,7 @@ package de.danoeh.antennapod.wearos
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.danoeh.antennapod.net.sync.wearinterface.WearDataPaths
@@ -54,10 +55,19 @@ class VolumeControlViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun switchOutput(context: Context) {
-        val intent = Intent("com.google.android.wearable.action.LAUNCH_OUTPUT_SWITCHER")
-        val packageName = context.packageName
-        intent.putExtra("com.google.android.wearable.extra.EXTRA_PACKAGE_NAME", packageName)
-        context.startActivity(intent)
+        try {
+            val intent = Intent("com.google.android.wearable.action.LAUNCH_OUTPUT_SWITCHER")
+            val packageName = context.packageName
+            intent.putExtra("com.google.android.wearable.extra.EXTRA_PACKAGE_NAME", packageName)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+                context.startActivity(intent)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
     }
 }
 
