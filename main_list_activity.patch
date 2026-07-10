@@ -1,0 +1,50 @@
+<<<<<<< SEARCH
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+=======
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+fun MainListScreen(
+    uiState: MainUiState,
+    onOpenEpisodeDetail: (FeedItem) -> Unit,
+    onOpenFeedList: () -> Unit,
+    onOpenEpisodeList: (String) -> Unit
+) {
+    val scrollState = rememberScalingLazyListState()
+=======
+fun MainListScreen(
+    uiState: MainUiState,
+    onOpenEpisodeDetail: (FeedItem) -> Unit,
+    onOpenFeedList: () -> Unit,
+    onOpenEpisodeList: (String) -> Unit
+) {
+    var hasAutoNavigated by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(uiState.nowPlaying) {
+        val nowPlaying = uiState.nowPlaying
+        if (nowPlaying != null && nowPlaying.isPlaying && !hasAutoNavigated) {
+            hasAutoNavigated = true
+            onOpenEpisodeDetail(nowPlaying.item)
+        }
+    }
+
+    val scrollState = rememberScalingLazyListState()
+>>>>>>> REPLACE
