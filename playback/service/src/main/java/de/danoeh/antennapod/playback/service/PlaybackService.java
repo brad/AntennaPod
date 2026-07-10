@@ -238,8 +238,8 @@ public class PlaybackService extends MediaBrowserServiceCompat {
             MainActivityStarter starter = new MainActivityStarter(context).withClearBackStack().withOpenPlayer();
             if (media instanceof FeedMedia) {
                 starter.withOpenEpisode(((FeedMedia) media).getId());
-             }
-             return starter.getIntent();
+            }
+            return starter.getIntent();
         }
     }
 
