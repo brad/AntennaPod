@@ -42,8 +42,14 @@
 
         <activity
             android:name="de.danoeh.antennapod.wearos.EpisodeDetailActivity"
-            android:exported="false"
-            android:taskAffinity=".wearos" />
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:taskAffinity=".wearos">
+            <intent-filter>
+                <action android:name="de.danoeh.antennapod.intents.MAIN_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="de.danoeh.antennapod.wearos.VolumeControlActivity"

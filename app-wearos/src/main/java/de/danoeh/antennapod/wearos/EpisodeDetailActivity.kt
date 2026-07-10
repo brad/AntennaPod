@@ -50,18 +50,26 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
 import coil.compose.AsyncImage
 import de.danoeh.antennapod.model.feed.FeedItem
+import de.danoeh.antennapod.ui.appstartintent.MainActivityStarter
 import de.danoeh.antennapod.ui.common.R as CommonR
 import de.danoeh.antennapod.wearos.composable.ListItem
 
 class EpisodeDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val episode = IntentCompat.getSerializableExtra(intent, EXTRA_EPISODE, FeedItem::class.java) ?: run {
+        val episode = IntentCompat.getSerializableExtra(intent, EXTRA_EPISODE, FeedItem::class.java)
+        val episodeId = intent.getLongExtra(MainActivityStarter.EXTRA_EPISODE_ID, -1L)
+        if (episode == null && episodeId == -1L) {
             finish()
             return
         }
-        val viewModel = ViewModelProvider(this, EpisodeDetailViewModel.factory(episode))
-            .get(EpisodeDetailViewModel::class.java)
+        val viewModel = ViewModelProvider(
+            this,
+            EpisodeDetailViewModel.factory(
+                episodeId.takeIf { it != -1L } ?: episode?.id ?: -1L,
+                episode
+            )
+        ).get(EpisodeDetailViewModel::class.java)
 
         setContent {
             AntennaPodTheme {

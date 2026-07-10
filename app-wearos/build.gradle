@@ -68,6 +68,7 @@ dependencies {
     implementation project(":ui:common")
     implementation project(":ui:notifications")
     implementation project(":net:sync:wear-interface")
+    implementation project(":ui:app-start-intent")
 
     // NOTE: DO NOT INCLUDE a dependency on androidx.compose.material:material, the watch version is a replacement
     implementation libs.androidx.wear

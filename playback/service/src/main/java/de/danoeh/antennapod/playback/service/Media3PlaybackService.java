@@ -94,6 +94,17 @@ public class Media3PlaybackService extends MediaLibraryService {
     private float volumeAdaptionFactor = 1.0f;
 
     @UnstableApi
+    private void updateSessionActivity() {
+        if (mediaSession != null) {
+            MainActivityStarter starter = new MainActivityStarter(this).withOpenPlayer();
+            if (currentPlayable != null) {
+                starter.withOpenEpisode(currentPlayable.getId());
+            }
+            mediaSession.setSessionActivity(starter.getPendingIntent());
+        }
+    }
+
+    @UnstableApi
     @Override
     public void onCreate() {
         super.onCreate();
@@ -177,8 +188,8 @@ public class Media3PlaybackService extends MediaLibraryService {
         };
         player.addListener(playerListener);
         mediaSession = new MediaLibraryService.MediaLibrarySession.Builder(this, player, sessionCallback)
-                .setSessionActivity(new MainActivityStarter(this).withOpenPlayer().getPendingIntent())
                 .build();
+        updateSessionActivity();
     }
 
     MediaLibrarySessionCallback sessionCallback = new MediaLibrarySessionCallback(this) {
@@ -261,6 +272,8 @@ public class Media3PlaybackService extends MediaLibraryService {
                     sleepTimer.episodeFinishedPlayback();
                     if (!sleepTimer.shouldContinueToNextEpisode()) {
                         player.stop();
+                        currentPlayable = null;
+                        updateSessionActivity();
                         player.clearMediaItems();
                         PlaybackPreferences.writeNoMediaPlaying();
                         EventBus.getDefault().post(
@@ -310,6 +323,7 @@ public class Media3PlaybackService extends MediaLibraryService {
         public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
             if (mediaItem == null) {
                 currentPlayable = null;
+                updateSessionActivity();
                 PlaybackPreferences.writeNoMediaPlaying();
                 EventBus.getDefault().post(new PlayerStatusEvent());
             } else {
@@ -432,6 +446,7 @@ public class Media3PlaybackService extends MediaLibraryService {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(media -> {
                             currentPlayable = media;
+                            updateSessionActivity();
                             if (player == null) {
                                 return;
                             }
@@ -656,6 +671,7 @@ public class Media3PlaybackService extends MediaLibraryService {
                             allowStreamingThisTime = false;
 
                             currentPlayable = nextMedia;
+                            updateSessionActivity();
                             currentPlayable.onPlaybackStart();
                             PlaybackPreferences.writeMediaPlaying(nextMedia);
                             if (nextMedia.getItem() != null && nextMedia.getItem().getFeed() != null) {
@@ -671,6 +687,8 @@ public class Media3PlaybackService extends MediaLibraryService {
                         error -> Log.e(TAG, "Failed to load next queue item", error),
                         () -> {
                             player.stop();
+                            currentPlayable = null;
+                            updateSessionActivity();
                             player.clearMediaItems();
                             PlaybackPreferences.writeNoMediaPlaying();
                             EventBus.getDefault().post(new PlayerStatusEvent());
