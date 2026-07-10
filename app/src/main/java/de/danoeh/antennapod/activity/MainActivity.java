@@ -764,15 +764,16 @@ public class MainActivity extends CastEnabledActivity implements NavigationToolb
                 }
             }
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else if (intent.getBooleanExtra(MainActivityStarter.EXTRA_OPEN_PLAYER, false)) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            bottomSheetCallback.onSlide(null, 1.0f);
         } else {
             handleDeeplink(intent.getData());
         }
 
         if (intent.getBooleanExtra(MainActivityStarter.EXTRA_OPEN_DRAWER, false) && drawerLayout != null) {
             drawerLayout.open();
+        }
+        if (intent.getBooleanExtra(MainActivityStarter.EXTRA_OPEN_PLAYER, false)) {
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            bottomSheetCallback.onSlide(null, 1.0f);
         }
         if (intent.getBooleanExtra(MainActivityStarter.EXTRA_OPEN_DOWNLOAD_LOGS, false)) {
             new DownloadLogFragment().show(getSupportFragmentManager(), DownloadLogFragment.TAG);

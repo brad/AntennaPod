@@ -219,7 +219,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         if (showVideoPlayer) {
             return new VideoPlayerActivityStarter(context).getIntent();
         } else {
-            return new MainActivityStarter(context).withClearBackStack().withOpenPlayer().getIntent();
+            MainActivityStarter starter = new MainActivityStarter(context).withClearBackStack().withOpenPlayer(); if (media instanceof FeedMedia) { starter.withOpenEpisode(((FeedMedia) media).getId()); } return starter.getIntent();
         }
     }
 
@@ -231,7 +231,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
         if (media.getMediaType() == MediaType.VIDEO && !isCasting) {
             return new VideoPlayerActivityStarter(context).getIntent();
         } else {
-            return new MainActivityStarter(context).withClearBackStack().withOpenPlayer().getIntent();
+            MainActivityStarter starter = new MainActivityStarter(context).withClearBackStack().withOpenPlayer(); if (media instanceof FeedMedia) { starter.withOpenEpisode(((FeedMedia) media).getId()); } return starter.getIntent();
         }
     }
 
@@ -1456,7 +1456,7 @@ public class PlaybackService extends MediaBrowserServiceCompat {
 
         if (stateManager.hasReceivedValidStartCommand()) {
             mediaSession.setSessionActivity(PendingIntent.getActivity(this, R.id.pending_intent_player_activity,
-                    PlaybackService.getPlayerActivityIntent(this), PendingIntent.FLAG_UPDATE_CURRENT
+                    PlaybackService.getPlayerActivityIntent(this, p), PendingIntent.FLAG_UPDATE_CURRENT
                             | (Build.VERSION.SDK_INT >= 31 ? PendingIntent.FLAG_MUTABLE : 0)));
             try {
                 mediaSession.setMetadata(builder.build());

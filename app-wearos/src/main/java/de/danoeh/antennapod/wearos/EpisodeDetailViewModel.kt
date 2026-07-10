@@ -29,14 +29,18 @@ data class EpisodeDetailUiState(
     val isCurrentlyPlaying: Boolean = false
 )
 
-class EpisodeDetailViewModel(application: Application, private val episode: FeedItem) : AndroidViewModel(application) {
+class EpisodeDetailViewModel(
+    application: Application,
+    private val episodeId: Long,
+    private val initialEpisode: FeedItem?
+) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(
         EpisodeDetailUiState(
-            item = episode,
-            title = episode.title ?: "",
-            feedTitle = episode.feed?.title ?: "",
-            position = episode.media?.position ?: 0,
-            duration = episode.media?.duration ?: 0
+            item = initialEpisode ?: FeedItem().apply { id = episodeId },
+            title = initialEpisode?.title ?: "",
+            feedTitle = initialEpisode?.feed?.title ?: "",
+            position = initialEpisode?.media?.position ?: 0,
+            duration = initialEpisode?.media?.duration ?: 0
         )
     )
     val uiState: StateFlow<EpisodeDetailUiState> = _uiState
@@ -52,7 +56,7 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
         viewModelScope.launch {
             WearDataRepository.nowPlaying.collect { nowPlaying ->
                 if (nowPlaying == null) return@collect
-                val isMatchingEpisode = nowPlaying.item.id == episode.id
+                val isMatchingEpisode = nowPlaying.item.id == episodeId
 
                 _uiState.update { currentState ->
                     if (isMatchingEpisode) {
@@ -92,7 +96,7 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
 
     fun play() {
         viewModelScope.launch(Dispatchers.IO) {
-            WearMessageSender.send(getApplication(), WearDataPaths.playPath(episode.id))
+            WearMessageSender.send(getApplication(), WearDataPaths.playPath(episodeId))
         }
     }
 
@@ -112,16 +116,17 @@ class EpisodeDetailViewModel(application: Application, private val episode: Feed
 
     fun openOnPhone() {
         viewModelScope.launch(Dispatchers.IO) {
-            WearMessageSender.send(getApplication(), WearDataPaths.openOnPhonePath(episode.id))
+            WearMessageSender.send(getApplication(), WearDataPaths.openOnPhonePath(episodeId))
         }
     }
 
     companion object {
-        fun factory(episode: FeedItem): ViewModelProvider.Factory = viewModelFactory {
+        fun factory(episodeId: Long, initialEpisode: FeedItem?): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 EpisodeDetailViewModel(
                     checkNotNull(get(ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY)),
-                    episode
+                    episodeId,
+                    initialEpisode
                 )
             }
         }
