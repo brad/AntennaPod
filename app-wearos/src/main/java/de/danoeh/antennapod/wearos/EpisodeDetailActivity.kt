@@ -58,15 +58,14 @@ class EpisodeDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val episode = IntentCompat.getSerializableExtra(intent, EXTRA_EPISODE, FeedItem::class.java)
-        val episodeId = intent.getLongExtra(MainActivityStarter.EXTRA_EPISODE_ID, -1L)
-        if (episode == null && episodeId == -1L) {
-            finish()
-            return
+        var episodeId = intent.getLongExtra(MainActivityStarter.EXTRA_EPISODE_ID, -1L)
+        if (episodeId == -1L && episode != null) {
+            episodeId = episode.id
         }
         val viewModel = ViewModelProvider(
             this,
             EpisodeDetailViewModel.factory(
-                episodeId.takeIf { it != -1L } ?: episode?.id ?: -1L,
+                episodeId,
                 episode
             )
         ).get(EpisodeDetailViewModel::class.java)

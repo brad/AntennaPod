@@ -56,7 +56,7 @@ class EpisodeDetailViewModel(
         viewModelScope.launch {
             WearDataRepository.nowPlaying.collect { nowPlaying ->
                 if (nowPlaying == null) return@collect
-                val isMatchingEpisode = nowPlaying.item.id == episodeId
+                val isMatchingEpisode = episodeId == -1L || nowPlaying.item.id == episodeId
 
                 _uiState.update { currentState ->
                     if (isMatchingEpisode) {
@@ -95,8 +95,11 @@ class EpisodeDetailViewModel(
     }
 
     fun play() {
-        viewModelScope.launch(Dispatchers.IO) {
-            WearMessageSender.send(getApplication(), WearDataPaths.playPath(episodeId))
+        val targetId = if (episodeId != -1L) episodeId else _uiState.value.item.id
+        if (targetId != -1L) {
+            viewModelScope.launch(Dispatchers.IO) {
+                WearMessageSender.send(getApplication(), WearDataPaths.playPath(targetId))
+            }
         }
     }
 
@@ -115,8 +118,11 @@ class EpisodeDetailViewModel(
     }
 
     fun openOnPhone() {
-        viewModelScope.launch(Dispatchers.IO) {
-            WearMessageSender.send(getApplication(), WearDataPaths.openOnPhonePath(episodeId))
+        val targetId = if (episodeId != -1L) episodeId else _uiState.value.item.id
+        if (targetId != -1L) {
+            viewModelScope.launch(Dispatchers.IO) {
+                WearMessageSender.send(getApplication(), WearDataPaths.openOnPhonePath(targetId))
+            }
         }
     }
 
